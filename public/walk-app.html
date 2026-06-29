@@ -3892,10 +3892,6 @@ function startWalk() {
   state.steps = 0; state.distance = 0; state.route = [];
   pedo.sessionSteps = 0;
 
-  const btn = document.getElementById('btn-rec');
-  btn.classList.add('walking');
-  document.getElementById('icon-play').style.display = 'none';
-  document.getElementById('icon-stop').style.display = 'block';
   document.getElementById('rec-badge').classList.add('visible');
   document.getElementById('stop-walk-fab').classList.remove('hidden');
   document.getElementById('nav').style.opacity = '0';
@@ -3911,10 +3907,6 @@ function stopWalk() {
   cancelAnimationFrame(state.animFrame);
   stopRouteSimulation();
 
-  const btn = document.getElementById('btn-rec');
-  btn.classList.remove('walking');
-  document.getElementById('icon-play').style.display = 'block';
-  document.getElementById('icon-stop').style.display = 'none';
   document.getElementById('rec-badge').classList.remove('visible');
   document.getElementById('stop-walk-fab').classList.add('hidden');
   document.getElementById('nav').style.opacity = '1';
@@ -3956,7 +3948,6 @@ function stopWalk() {
   renderHomePanel();
 }
 
-document.getElementById('btn-rec').addEventListener('click', toggleWalk);
 
 /* ═══════════════════════════════
    ARCHIVE — SAVE ROUTE
