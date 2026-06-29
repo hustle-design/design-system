@@ -4132,7 +4132,9 @@ function openReportSheetWith(archiveId) {
 }
 function closeReportSheet() {
   document.getElementById('report-sheet').classList.remove('open');
-  document.getElementById('report-fab').classList.remove('hidden');
+  if (state.tab === 'history') {
+    document.getElementById('report-fab').classList.remove('hidden');
+  }
 }
 function renderReportHistList() {
   const list = document.getElementById('report-hist-list');
