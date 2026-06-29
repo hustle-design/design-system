@@ -934,6 +934,30 @@ body {
 }
 
 .history-card:active { transform: scale(0.98); }
+.archive-section-label {
+  padding: 16px 20px 8px;
+  font: var(--C1); font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.archive-saved-card { border-bottom: 1px solid var(--neutral-200); }
+.archive-report-btn {
+  flex-shrink: 0;
+  height: 32px; padding: 0 12px;
+  background: var(--neutral-1000);
+  color: var(--neutral-0);
+  border: none; border-radius: 16px;
+  font: var(--C1); font-weight: 700;
+  cursor: pointer; transition: opacity 0.15s;
+  align-self: center;
+}
+.archive-report-btn:active { opacity: 0.75; }
+.hist-name {
+  font: var(--B4); font-weight: 700;
+  color: var(--neutral-1000);
+  margin-bottom: 2px;
+}
 
 .hist-thumb {
   width: 60px; height: 60px;
@@ -2291,8 +2315,14 @@ body {
     <!-- ── HISTORY TAB ── -->
     <div class="tab-panel" id="tab-history">
       <div class="tab-header">
-        <h1>기록</h1>
-        <p>총 <span id="total-walks">3</span>번의 산책</p>
+        <h1>아카이브</h1>
+        <p>내가 걸은 길 <span id="total-walks">3</span>개</p>
+      </div>
+      <!-- 저장된 코스 (제보 가능) -->
+      <div id="archive-saved-section" style="display:none">
+        <div class="archive-section-label">저장한 코스</div>
+        <div class="history-list" id="archive-saved-list"></div>
+        <div class="archive-section-label" style="margin-top:8px">산책 기록</div>
       </div>
       <div class="history-list" id="history-list"></div>
     </div>
@@ -2464,7 +2494,7 @@ body {
           <path d="M9.5 14 7 19m7.5-5L17 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </g>
       </svg>
-        <span class="nav-btn-label">기록</span>
+        <span class="nav-btn-label">만보기</span>
       </div>
     </button>
 
@@ -2505,19 +2535,17 @@ body {
     </button>
 
     <!-- 히스토리 -->
-    <button class="nav-btn" id="nav-history" onclick="switchTab('history')" aria-label="히스토리">
+    <button class="nav-btn" id="nav-history" onclick="switchTab('history')" aria-label="아카이브">
       <div class="nav-btn-inner">
         <svg viewBox="0 0 24 24" fill="none">
         <g class="ic-out">
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7" fill="none"/>
-          <path d="M12 7.5v4.5l3 1.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 4h14a1 1 0 0 1 1 1v14.5l-7-3-7 3V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" fill="none"/>
         </g>
         <g class="ic-fill">
-          <circle cx="12" cy="12" r="9.5" fill="currentColor"/>
-          <path d="M12 7.5v4.5l3 1.8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 4h14a1 1 0 0 1 1 1v14.5l-7-3-7 3V5a1 1 0 0 1 1-1Z" fill="currentColor"/>
         </g>
       </svg>
-        <span class="nav-btn-label">히스토리</span>
+        <span class="nav-btn-label">아카이브</span>
       </div>
     </button>
 
@@ -3741,6 +3769,7 @@ function confirmSaveRoute() {
 
   myArchives.unshift(archive);
   renderMyCourses();
+  renderHistory();
   closeSaveSheet();
 
   // Brief toast feedback
@@ -3965,7 +3994,7 @@ function renderCourses() {
 ═══════════════════════════════ */
 function switchTab(tab) {
   const fab = document.getElementById('report-fab');
-  if (fab) fab.classList.toggle('hidden', tab !== 'courses');
+  if (fab) fab.classList.toggle('hidden', tab !== 'history');
   state.tab = tab;
   document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -3977,11 +4006,47 @@ function switchTab(tab) {
    HISTORY RENDER
 ═══════════════════════════════ */
 function renderHistory() {
+  // ── 저장한 코스 섹션 (myArchives)
+  const savedSection = document.getElementById('archive-saved-section');
+  const savedList = document.getElementById('archive-saved-list');
+  if (myArchives.length > 0) {
+    savedSection.style.display = 'block';
+    savedList.innerHTML = '';
+    myArchives.forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'history-card archive-saved-card';
+      card.innerHTML = `
+        <div class="hist-thumb"><canvas id="athumb-${a.id}" width="62" height="62"></canvas></div>
+        <div class="hist-info">
+          <div class="hist-name">${a.name}</div>
+          <div class="hist-stats">
+            <span class="hist-main">${a.distance.toFixed(1)}</span>
+            <span class="hist-unit">km</span>
+            <span style="color:var(--ink-3);font-size:13px;margin-left:6px">·</span>
+            <span class="hist-main" style="font-size:20px;line-height:1">${formatTime(a.duration)}</span>
+          </div>
+          <div class="hist-secondary">${a.steps.toLocaleString('ko-KR')}걸음</div>
+        </div>
+        <button class="archive-report-btn" onclick="openReportSheetWith(${a.id})">제보</button>
+      `;
+      savedList.appendChild(card);
+      requestAnimationFrame(() => {
+        const cv = document.getElementById(`athumb-${a.id}`);
+        if (cv) drawThumb(cv, a.route);
+      });
+    });
+  } else {
+    savedSection.style.display = 'none';
+  }
+
+  // ── 산책 기록 섹션 (state.history)
   const list = document.getElementById('history-list');
-  document.getElementById('total-walks').textContent = state.history.length;
+  document.getElementById('total-walks').textContent = state.history.length + myArchives.length;
 
   if (state.history.length === 0) {
-    list.innerHTML = '<div class="history-empty"><p>아직 기록이 없어요</p><p style="font-size:13px;line-height:125%;color:var(--ink-3)">첫 산책을 시작해보세요</p></div>';
+    list.innerHTML = myArchives.length === 0
+      ? '<div class="history-empty"><p>아직 기록이 없어요</p><p style="font-size:13px;line-height:125%;color:var(--ink-3)">첫 산책을 시작해보세요</p></div>'
+      : '';
     return;
   }
 
@@ -4005,8 +4070,8 @@ function renderHistory() {
     `;
     list.appendChild(card);
     requestAnimationFrame(() => {
-      const c = document.getElementById(`thumb-${h.id}`);
-      if (c) drawThumb(c, h.route);
+      const cv = document.getElementById(`thumb-${h.id}`);
+      if (cv) drawThumb(cv, h.route);
     });
   });
 }
@@ -4076,6 +4141,18 @@ function openReportSheet() {
   document.getElementById('report-fab').classList.add('hidden');
   goReportStep1();
   renderReportHistList();
+}
+function openReportSheetWith(archiveId) {
+  // FAB는 아카이브 탭에서 열 때만 숨김
+  document.getElementById('report-fab').classList.add('hidden');
+  document.getElementById('report-sheet').classList.add('open');
+  reportSelectedId = archiveId;
+  goReportStep2();
+  const a = myArchives.find(x => x.id === archiveId);
+  if (a) {
+    const nameEl = document.getElementById('report-name');
+    if (a.name) nameEl.value = a.name;
+  }
 }
 function closeReportSheet() {
   document.getElementById('report-sheet').classList.remove('open');
