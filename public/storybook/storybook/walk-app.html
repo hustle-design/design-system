@@ -13,50 +13,45 @@
 /* ── Design System Tokens ───────────────────────────────────── */
 :root {
   /* Neutral */
-  --neutral-black:   #000000;
-  --neutral-1000: #1a1c20;
-  --neutral-950: #2a3038;
-  --neutral-900: #3e464c;
-  --neutral-800: #565d6d;
-  --neutral-700: #868b94;
+  --neutral-0:   #000000;
+  --neutral-100: #1a1c20;
+  --neutral-200: #2a3038;
+  --neutral-300: #3e464c;
+  --neutral-400: #565d6d;
+  --neutral-500: #868b94;
   --neutral-600: #b1b3bb;
-  --neutral-500: #d2d3d9;
-  --neutral-400: #dddee4;
-  --neutral-300: #eeeff1;
-  --neutral-200: #f3f4f5;
-  --neutral-100: #f7f8f9;
-  --neutral-50: #fbfbfc;
-  --neutral-0: #ffffff;
+  --neutral-700: #d2d3d9;
+  --neutral-750: #dddee4;
+  --neutral-800: #eeeff1;
+  --neutral-850: #f3f4f5;
+  --neutral-900: #f7f8f9;
+  --neutral-950: #fbfbfc;
+  --neutral-1000: #ffffff;
 
   /* Green */
-  --green-800: #00745f;
-  --green-700: #079171;
-  --green-600: #10ab7d;
-  --green-500: #42c593;
-  --green-400: #7ddcb3;
-  --green-300: #b9e9d2;
-  --green-200: #d9f6e9;
-  --green-100: #edfaf6;
+  --green-100: #00745f;
+  --green-200: #079171;
+  --green-300: #10ab7d;
+  --green-400: #42c593;
+  --green-500: #7ddcb3;
+  --green-600: #b9e9d2;
+  --green-700: #d9f6e9;
+  --green-800: #edfaf6;
 
   /* Red */
-  --red-800: #ca1d13;
-  --red-700: #fa342c;
-  --red-600: #ff625e;
-  --red-500: #fe928d;
-  --red-400: #feb7b3;
-  --red-300: #fed4d2;
-  --red-200: #fde7e7;
-  --red-100: #fdf0f0;
+  --red-100: #ca1d13;
+  --red-200: #fa342c;
+  --red-300: #ff625e;
+  --red-400: #fe928d;
+  --red-700: #fde7e7;
+  --red-800: #fdf0f0;
 
   /* Blue */
-  --blue-800: #135fcd;
-  --blue-700: #217cf9;
-  --blue-600: #5e98fe;
-  --blue-500: #85b8fd;
-  --blue-400: #aacefd;
-  --blue-300: #cbdffa;
-  --blue-200: #e2edfc;
-  --blue-100: #eff6ff;
+  --blue-100: #135fcd;
+  --blue-200: #217cf9;
+  --blue-300: #5e98fe;
+  --blue-700: #e2edfc;
+  --blue-800: #eff6ff;
 
   /* Typography scale (font-size px / font-weight / line-height) */
   --font: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
@@ -80,23 +75,23 @@
   --P3: 500 14px/150% 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
 
   /* ── Semantic aliases (walk app) ──────────────────────────── */
-  --bg:           var(--neutral-100);
-  --surface:      var(--neutral-0);
-  --surface-2:    var(--neutral-50);
-  --ink:          var(--neutral-1000);
-  --ink-2:        var(--neutral-700);
-  --ink-3:        var(--neutral-500);
-  --accent:       var(--neutral-1000);
-  --accent-bright:var(--neutral-900);
-  --accent-faint: var(--neutral-200);
+  --bg:           var(--neutral-900);
+  --surface:      var(--neutral-1000);
+  --surface-2:    var(--neutral-950);
+  --ink:          var(--neutral-100);
+  --ink-2:        var(--neutral-500);
+  --ink-3:        var(--neutral-700);
+  --accent:       var(--neutral-100);
+  --accent-bright:var(--neutral-300);
+  --accent-faint: var(--neutral-850);
   --amber:        #E07B00;
   --amber-faint:  #FFF4E0;
-  --blue:         var(--blue-700);
-  --blue-faint:   var(--blue-100);
-  --danger:       var(--red-700);
-  --danger-faint: var(--red-100);
-  --green:        var(--green-600);
-  --green-faint:  var(--green-100);
+  --blue:         var(--blue-200);
+  --blue-faint:   var(--blue-800);
+  --danger:       var(--red-200);
+  --danger-faint: var(--red-800);
+  --green:        var(--green-300);
+  --green-faint:  var(--green-800);
 
   /* Radii & shadows */
   --r-sm: 6px;  --r-md: 12px;  --r-lg: 16px;  --r-xl: 20px;
@@ -106,7 +101,7 @@
 }
 
 body {
-  background: var(--neutral-950);
+  background: var(--neutral-200);
   min-height: 100svh;
   display: flex;
   align-items: center;
@@ -843,13 +838,13 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--neutral-700);
+  color: var(--neutral-500);
   padding: 0;
   transition: color 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
 
-.nav-btn.active { color: var(--neutral-1000); }
+.nav-btn.active { color: var(--neutral-100); }
 
 .nav-btn-inner {
   display: flex;
@@ -862,7 +857,7 @@ body {
 }
 
 .nav-btn.active .nav-btn-inner {
-  background: var(--neutral-200);
+  background: var(--neutral-850);
 }
 
 .nav-btn svg { width: 24px; height: 24px; display: block; }
@@ -1143,7 +1138,7 @@ body {
   height: 54px;
   padding: 0 20px;
   background: var(--bg);
-  color: var(--neutral-700);
+  color: var(--neutral-500);
   border: none;
   border-radius: 99px;
   font: var(--B3);
@@ -1823,7 +1818,7 @@ body {
   border: none;
   font: var(--B4);
   font-weight: 400;
-  color: var(--neutral-700);
+  color: var(--neutral-500);
   cursor: pointer;
   padding: 0;
   display: none;
