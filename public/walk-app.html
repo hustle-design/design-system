@@ -420,7 +420,7 @@ body {
 .report-fab {
   position: absolute;
   right: 20px;
-  bottom: 122px;
+  bottom: 114px;
   width: 52px; height: 52px;
   background: var(--neutral-1000);
   border: none;
@@ -485,6 +485,70 @@ body {
   color: var(--neutral-700);
 }
 .report-body { padding: 12px 20px 32px; display: flex; flex-direction: column; gap: 16px; }
+.report-step { display: none; flex-direction: column; flex: 1; }
+.report-step.active { display: flex; }
+.report-section-title {
+  font: var(--B4); font-weight: 700; color: var(--neutral-900);
+  padding: 20px 20px 10px;
+}
+.report-hist-list { display: flex; flex-direction: column; gap: 0; flex: 1; overflow-y: auto; }
+.report-hist-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-bottom: 1px solid var(--neutral-200);
+}
+.report-hist-item:active { background: var(--neutral-100); }
+.report-hist-item.selected { background: var(--neutral-100); }
+.report-hist-thumb {
+  width: 52px; height: 52px; border-radius: 10px;
+  background: var(--neutral-200); overflow: hidden; flex-shrink: 0;
+}
+.report-hist-thumb canvas { width: 100%; height: 100%; display: block; }
+.report-hist-info { flex: 1; min-width: 0; }
+.report-hist-date { font: var(--C1); color: var(--ink-3); }
+.report-hist-stats { font: var(--B4); font-weight: 700; color: var(--neutral-1000); margin-top: 2px; }
+.report-hist-check {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--neutral-400);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.15s;
+}
+.report-hist-item.selected .report-hist-check {
+  background: var(--neutral-1000); border-color: var(--neutral-1000);
+}
+.report-hist-item.selected .report-hist-check svg { display: block; }
+.report-hist-check svg { display: none; width: 12px; height: 12px; color: white; }
+.report-divider { height: 1px; background: var(--neutral-200); margin: 0; }
+.report-manual-btn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px; cursor: pointer;
+  background: none; border: none; width: 100%; text-align: left;
+}
+.report-manual-btn:active { background: var(--neutral-100); }
+.report-manual-icon {
+  width: 52px; height: 52px; border-radius: 10px;
+  background: var(--neutral-200);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.report-manual-icon svg { width: 20px; height: 20px; color: var(--neutral-700); }
+.report-manual-text .report-hist-stats { color: var(--neutral-800); }
+.report-bottom-bar {
+  padding: 12px 20px 28px;
+  border-top: 1px solid var(--neutral-200);
+  flex-shrink: 0;
+}
+.report-next-btn {
+  width: 100%; height: 52px;
+  background: var(--neutral-1000);
+  color: var(--neutral-0);
+  border: none; border-radius: 26px;
+  font: var(--B3); font-weight: 700;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.report-next-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.report-next-btn:active:not(:disabled) { opacity: 0.82; }
 .report-field-label { font: var(--B5); font-weight: 700; color: var(--neutral-900); margin-bottom: 6px; }
 .report-input {
   width: 100%; height: 48px;
@@ -493,58 +557,38 @@ body {
   border-radius: var(--r-md);
   padding: 0 14px;
   font: var(--B4); color: var(--neutral-1000);
-  outline: none;
-  transition: border-color 0.15s;
+  outline: none; transition: border-color 0.15s;
 }
 .report-input:focus { border-color: var(--neutral-700); }
 .report-input::placeholder { color: var(--ink-3); }
 .report-textarea {
-  width: 100%; height: 96px;
+  width: 100%; height: 88px;
   background: var(--neutral-100);
   border: 1.5px solid var(--neutral-300);
   border-radius: var(--r-md);
   padding: 12px 14px;
   font: var(--B4); color: var(--neutral-1000);
-  outline: none; resize: none;
-  transition: border-color 0.15s;
+  outline: none; resize: none; transition: border-color 0.15s;
   font-family: var(--font);
 }
 .report-textarea:focus { border-color: var(--neutral-700); }
 .report-textarea::placeholder { color: var(--ink-3); }
-.report-location-btn {
-  width: 100%; height: 48px;
-  background: var(--neutral-100);
-  border: 1.5px solid var(--neutral-300);
-  border-radius: var(--r-md);
-  display: flex; align-items: center; gap: 8px;
-  padding: 0 14px; cursor: pointer;
-  font: var(--B4); color: var(--ink-3);
-  transition: border-color 0.15s;
-}
-.report-location-btn:active { border-color: var(--neutral-700); }
-.report-location-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 .report-tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .report-tag {
-  padding: 7px 14px;
-  border-radius: 20px;
+  padding: 7px 14px; border-radius: 20px;
   border: 1.5px solid var(--neutral-300);
   background: var(--neutral-0);
   font: var(--B5); color: var(--neutral-700);
   cursor: pointer; transition: all 0.15s;
 }
-.report-tag.selected {
-  border-color: var(--neutral-1000);
-  background: var(--neutral-1000);
-  color: var(--neutral-0);
-}
+.report-tag.selected { border-color: var(--neutral-1000); background: var(--neutral-1000); color: var(--neutral-0); }
+.report-body { padding: 20px 20px 0; display: flex; flex-direction: column; gap: 16px; }
 .report-submit {
   width: 100%; height: 52px;
-  background: var(--neutral-1000);
-  color: var(--neutral-0);
+  background: var(--neutral-1000); color: var(--neutral-0);
   border: none; border-radius: 26px;
   font: var(--B3); font-weight: 700;
-  cursor: pointer; margin-top: 8px;
-  transition: opacity 0.15s;
+  cursor: pointer; transition: opacity 0.15s;
 }
 .report-submit:active { opacity: 0.82; }
 
@@ -2339,47 +2383,63 @@ body {
   <div id="report-sheet">
     <div class="course-sheet-backdrop" onclick="closeReportSheet()"></div>
     <div class="course-sheet-panel">
-      <div class="sheet-handle"></div>
-      <div class="report-sheet-head">
-        <button class="report-back-btn" onclick="closeReportSheet()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <div class="report-sheet-title">산책로 제보</div>
-      </div>
-      <div class="report-body">
-        <div>
-          <div class="report-field-label">코스 이름</div>
-          <input class="report-input" placeholder="예) 한강 반포지구 야경 코스" id="report-name"/>
-        </div>
-        <div>
-          <div class="report-field-label">위치</div>
-          <button class="report-location-btn" id="report-loc-btn" onclick="setReportLocation()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-            <span id="report-loc-text">현재 위치 사용하기</span>
+      <!-- Step 1: 코스 선택 -->
+      <div class="report-step active" id="report-step1">
+        <div class="report-sheet-head">
+          <button class="report-back-btn" onclick="closeReportSheet()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
+          <div class="report-sheet-title">산책로 제보</div>
         </div>
-        <div>
-          <div class="report-field-label">거리 (km)</div>
-          <input class="report-input" type="number" placeholder="예) 3.2" id="report-dist" step="0.1" min="0"/>
-        </div>
-        <div>
-          <div class="report-field-label">코스 특징</div>
-          <div class="report-tag-row" id="report-tags">
-            <button class="report-tag" onclick="toggleReportTag(this)">숲길</button>
-            <button class="report-tag" onclick="toggleReportTag(this)">강변</button>
-            <button class="report-tag" onclick="toggleReportTag(this)">공원</button>
-            <button class="report-tag" onclick="toggleReportTag(this)">야경</button>
-            <button class="report-tag" onclick="toggleReportTag(this)">벚꽃</button>
-            <button class="report-tag" onclick="toggleReportTag(this)">등산</button>
-            <button class="report-tag" onclick="toggleReportTag(this)">도심</button>
-            <button class="report-tag" onclick="toggleReportTag(this)">조용함</button>
+        <div class="report-section-title">제보할 코스를 선택해주세요</div>
+        <div class="report-hist-list" id="report-hist-list"></div>
+        <div class="report-divider"></div>
+        <button class="report-manual-btn" onclick="selectManualReport()">
+          <div class="report-manual-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
           </div>
+          <div class="report-manual-text">
+            <div class="report-hist-date">직접 입력</div>
+            <div class="report-hist-stats">새 산책로 직접 등록하기</div>
+          </div>
+        </button>
+        <div class="report-bottom-bar">
+          <button class="report-next-btn" id="report-next-btn" onclick="goReportStep2()" disabled>다음</button>
         </div>
-        <div>
-          <div class="report-field-label">한 줄 설명</div>
-          <textarea class="report-textarea" placeholder="이 코스만의 매력을 알려주세요" id="report-desc"></textarea>
+      </div>
+
+      <!-- Step 2: 정보 입력 -->
+      <div class="report-step" id="report-step2">
+        <div class="report-sheet-head">
+          <button class="report-back-btn" onclick="goReportStep1()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="report-sheet-title">코스 정보</div>
         </div>
-        <button class="report-submit" onclick="submitReport()">제보 완료</button>
+        <div class="report-body" style="overflow-y:auto; flex:1; padding-bottom: 20px;">
+          <div>
+            <div class="report-field-label">코스 이름</div>
+            <input class="report-input" placeholder="예) 한강 반포지구 야경 코스" id="report-name"/>
+          </div>
+          <div>
+            <div class="report-field-label">코스 특징</div>
+            <div class="report-tag-row" id="report-tags">
+              <button class="report-tag" onclick="toggleReportTag(this)">숲길</button>
+              <button class="report-tag" onclick="toggleReportTag(this)">강변</button>
+              <button class="report-tag" onclick="toggleReportTag(this)">공원</button>
+              <button class="report-tag" onclick="toggleReportTag(this)">야경</button>
+              <button class="report-tag" onclick="toggleReportTag(this)">벚꽃</button>
+              <button class="report-tag" onclick="toggleReportTag(this)">등산</button>
+              <button class="report-tag" onclick="toggleReportTag(this)">도심</button>
+              <button class="report-tag" onclick="toggleReportTag(this)">조용함</button>
+            </div>
+          </div>
+          <div>
+            <div class="report-field-label">한 줄 설명</div>
+            <textarea class="report-textarea" placeholder="이 코스만의 매력을 알려주세요" id="report-desc"></textarea>
+          </div>
+          <button class="report-submit" onclick="submitReport()">제보 완료</button>
+        </div>
       </div>
     </div>
   </div>
@@ -4008,32 +4068,80 @@ window.addEventListener('load', () => {
 });
 
 
+let reportSelectedId = null;
+
 function openReportSheet() {
+  reportSelectedId = null;
   document.getElementById('report-sheet').classList.add('open');
   document.getElementById('report-fab').classList.add('hidden');
+  goReportStep1();
+  renderReportHistList();
 }
 function closeReportSheet() {
-  const s = document.getElementById('report-sheet');
-  s.classList.remove('open');
-  const fab = document.getElementById('report-fab');
-  if (document.querySelector('#nav-courses.active, #nav-courses[data-active]') ||
-      document.getElementById('tab-courses').classList.contains('active')) {
-    fab.classList.remove('hidden');
+  document.getElementById('report-sheet').classList.remove('open');
+  if (document.getElementById('tab-courses').classList.contains('active')) {
+    document.getElementById('report-fab').classList.remove('hidden');
   }
 }
-function toggleReportTag(el) {
-  el.classList.toggle('selected');
+function renderReportHistList() {
+  const list = document.getElementById('report-hist-list');
+  const items = [...state.history, ...(myArchives || []).slice(0,3)];
+  if (!items.length) {
+    list.innerHTML = '<div style="padding:24px 20px;color:var(--ink-3);font:var(--B4)">기록된 코스가 없어요</div>';
+    return;
+  }
+  list.innerHTML = items.map(h => {
+    const dist = h.distance ? h.distance.toFixed(1) : '—';
+    const dur = h.duration ? Math.round(h.duration/60) : h.duration_min || '—';
+    const date = h.dateLabel || h.savedAt || '';
+    return `<div class="report-hist-item" onclick="selectReportHist(${h.id}, this)">
+      <div class="report-hist-thumb"><canvas id="rhist-${h.id}" width="52" height="52"></canvas></div>
+      <div class="report-hist-info">
+        <div class="report-hist-date">${date}</div>
+        <div class="report-hist-stats">${dist} km · ${dur}분</div>
+      </div>
+      <div class="report-hist-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+    </div>`;
+  }).join('');
+  // 썸네일 캔버스 그리기
+  items.forEach(h => {
+    const cv = document.getElementById(`rhist-${h.id}`);
+    if (cv && h.route) {
+      const ctx = cv.getContext('2d');
+      drawRouteOnCtx(ctx, h.route, '#1a1c20', 2, 2.5);
+    }
+  });
 }
-function setReportLocation() {
-  const btn = document.getElementById('report-loc-btn');
-  const txt = document.getElementById('report-loc-text');
-  txt.textContent = '위치 불러오는 중...';
-  setTimeout(() => {
-    txt.textContent = '서울특별시 · 현재 위치';
-    txt.style.color = 'var(--neutral-1000)';
-    btn.style.borderColor = 'var(--neutral-700)';
-  }, 800);
+function selectReportHist(id, el) {
+  document.querySelectorAll('.report-hist-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  reportSelectedId = id;
+  document.getElementById('report-next-btn').disabled = false;
 }
+function selectManualReport() {
+  reportSelectedId = 'manual';
+  goReportStep2();
+}
+function goReportStep1() {
+  document.getElementById('report-step1').classList.add('active');
+  document.getElementById('report-step2').classList.remove('active');
+}
+function goReportStep2() {
+  if (!reportSelectedId) return;
+  document.getElementById('report-step1').classList.remove('active');
+  document.getElementById('report-step2').classList.add('active');
+  // 선택된 코스 이름 자동 채우기
+  if (reportSelectedId !== 'manual') {
+    const h = [...state.history, ...(myArchives||[])].find(x => x.id === reportSelectedId);
+    if (h) {
+      const nameEl = document.getElementById('report-name');
+      if (h.name) nameEl.value = h.name;
+    }
+  }
+}
+function toggleReportTag(el) { el.classList.toggle('selected'); }
 function submitReport() {
   const name = document.getElementById('report-name').value.trim();
   if (!name) { document.getElementById('report-name').focus(); return; }
