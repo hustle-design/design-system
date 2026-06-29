@@ -2156,36 +2156,12 @@ body {
         <canvas id="map-canvas"></canvas>
       </div>
 
-      <!-- 만보기 위젯 -->
-      <div class="pedo-widget">
-        <div class="pedo-ring-wrap">
-          <svg viewBox="0 0 56 56">
-            <circle class="pedo-ring-bg" cx="28" cy="28" r="22"/>
-            <circle class="pedo-ring-fill" id="pedo-ring" cx="28" cy="28" r="22"/>
-          </svg>
-          <div class="pedo-ring-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M13 4a1 1 0 1 0 2 0 1 1 0 0 0-2 0"/>
-              <path d="M7.5 17.5L9 13l3 2 2.5-5"/>
-              <path d="M9 13l-2 5"/>
-              <path d="M14 8l1.5 3-3.5 2"/>
-            </svg>
-          </div>
-        </div>
-        <div class="pedo-info">
-          <div>
-            <span class="pedo-steps" id="pedo-steps">3,124</span>
-            <span class="pedo-steps-unit"> 보</span>
-          </div>
-          <div class="pedo-bar-wrap">
-            <div class="pedo-bar-fill" id="pedo-bar" style="width:52%"></div>
-          </div>
-          <div class="pedo-goal-row">
-            <span class="pedo-goal-text" id="pedo-goal-text">목표 6,000보 · 52%</span>
-            <div class="pedo-sensor-dot" id="pedo-sensor-dot"></div>
-          </div>
-        </div>
-      </div>
+      <!-- 숨김 처리된 만보기 DOM (updatePedoUI 참조용) -->
+      <span id="pedo-steps" style="display:none">3,124</span>
+      <div id="pedo-bar" style="display:none"></div>
+      <span id="pedo-goal-text" style="display:none"></span>
+      <div id="pedo-sensor-dot" style="display:none"></div>
+      <div id="pedo-ring" style="display:none"></div>
 
       <div class="stats-overlay">
         <!-- Active course banner -->
