@@ -3891,6 +3891,8 @@ function startWalk() {
   state.startMs = Date.now();
   state.steps = 0; state.distance = 0; state.route = [];
   pedo.sessionSteps = 0;
+  // 서비스 제공 코스를 따라가는 경우 true
+  state.followingServiceCourse = !!(activeCourse && COURSES.some(c => c.id === activeCourse.id));
 
   document.getElementById('rec-badge').classList.add('visible');
   document.getElementById('stop-walk-fab').classList.remove('hidden');
@@ -3927,7 +3929,8 @@ function stopWalk() {
       duration: Math.round(elapsed),
       steps: state.steps,
       distance: parseFloat(state.distance.toFixed(2)),
-      route: [...state.route]
+      route: [...state.route],
+      followingServiceCourse: state.followingServiceCourse
     };
     state.history.unshift(entry);
     state.dailySteps += state.steps;
@@ -4004,6 +4007,7 @@ function confirmSaveRoute() {
     route: pendingEntry.route,
     dateLabel: pendingEntry.dateLabel,
     savedAt: new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }),
+    isServiceCourse: !!pendingEntry.followingServiceCourse,
   };
 
   myArchives.unshift(archive);
@@ -4330,7 +4334,7 @@ function renderHistory() {
           </div>
           <div class="hist-secondary">${a.steps.toLocaleString('ko-KR')}걸음</div>
         </div>
-        <button class="archive-report-btn" onclick="openReportSheetWith(${a.id})">제보</button>
+        ${!a.isServiceCourse ? `<button class="archive-report-btn" onclick="openReportSheetWith(${a.id})">제보</button>` : ''}
       `;
       savedList.appendChild(card);
       requestAnimationFrame(() => {
