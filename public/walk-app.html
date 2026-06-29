@@ -2137,50 +2137,50 @@ body {
       </div>
     </div>
 
-    <!-- ── COURSE DETAIL SHEET ── -->
-    <div id="course-sheet">
-      <div class="course-sheet-backdrop" onclick="closeCourseSheet()"></div>
-      <div class="course-sheet-panel">
-        <div class="sheet-handle"></div>
-        <div class="sheet-map">
-          <canvas id="sheet-map-canvas"></canvas>
-        </div>
-        <div class="sheet-body">
-          <div class="sheet-area-tag" id="sheet-area">—</div>
-          <div class="sheet-name" id="sheet-name">—</div>
-          <div class="sheet-desc" id="sheet-desc">—</div>
-          <div class="sheet-stats">
-            <div class="sheet-stat">
-              <div class="sheet-stat-val" id="sheet-dist">—</div>
-              <div class="sheet-stat-unit">km</div>
-              <div class="sheet-stat-lbl">거리</div>
-            </div>
-            <div class="sheet-stat">
-              <div class="sheet-stat-val" id="sheet-dur">—</div>
-              <div class="sheet-stat-unit">분</div>
-              <div class="sheet-stat-lbl">예상 시간</div>
-            </div>
-            <div class="sheet-stat">
-              <div id="sheet-diff-dots" class="sheet-diff-row" style="justify-content:center;margin-top:3px;"></div>
-              <div class="sheet-stat-lbl" id="sheet-diff-label" style="margin-top:8px;">난이도</div>
-            </div>
+  </div>
+
+  <!-- ── COURSE DETAIL SHEET ── -->
+  <div id="course-sheet">
+    <div class="course-sheet-backdrop" onclick="closeCourseSheet()"></div>
+    <div class="course-sheet-panel">
+      <div class="sheet-handle"></div>
+      <div class="sheet-map">
+        <canvas id="sheet-map-canvas"></canvas>
+      </div>
+      <div class="sheet-body">
+        <div class="sheet-area-tag" id="sheet-area">—</div>
+        <div class="sheet-name" id="sheet-name">—</div>
+        <div class="sheet-desc" id="sheet-desc">—</div>
+        <div class="sheet-stats">
+          <div class="sheet-stat">
+            <div class="sheet-stat-val" id="sheet-dist">—</div>
+            <div class="sheet-stat-unit">km</div>
+            <div class="sheet-stat-lbl">거리</div>
           </div>
-          <div class="sheet-tags" id="sheet-tags"></div>
+          <div class="sheet-stat">
+            <div class="sheet-stat-val" id="sheet-dur">—</div>
+            <div class="sheet-stat-unit">분</div>
+            <div class="sheet-stat-lbl">예상 시간</div>
+          </div>
+          <div class="sheet-stat">
+            <div id="sheet-diff-dots" class="sheet-diff-row" style="justify-content:center;margin-top:3px;"></div>
+            <div class="sheet-stat-lbl" id="sheet-diff-label" style="margin-top:8px;">난이도</div>
+          </div>
         </div>
-        <div class="sheet-actions">
-          <button class="sheet-btn-start" onclick="startCourseFromSheet()">
-            <svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg>
-            기록 시작
-          </button>
-          <button class="sheet-btn-close" onclick="closeCourseSheet()" aria-label="닫기">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M18 6L6 18M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
+        <div class="sheet-tags" id="sheet-tags"></div>
+      </div>
+      <div class="sheet-actions">
+        <button class="sheet-btn-start" onclick="startCourseFromSheet()">
+          <svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+          기록 시작
+        </button>
+        <button class="sheet-btn-close" onclick="closeCourseSheet()" aria-label="닫기">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
     </div>
-
   </div>
 
   <!-- Bottom nav -->
