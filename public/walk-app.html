@@ -1743,7 +1743,7 @@ body {
 
 /* Bottom bar */
 .ob-bottom {
-  padding: 20px 28px 32px;
+  padding: 20px 20px 32px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -2326,12 +2326,12 @@ function obDrawWelcomeMap() {
   if (!canvas) return;
   if (obMapRaf) cancelAnimationFrame(obMapRaf);
 
-  const d = window.devicePixelRatio || 1;
   const S = 220;
-  canvas.width = S * d;
-  canvas.height = S * d;
+  canvas.width = S;
+  canvas.height = S;
+  canvas.style.width = S + 'px';
+  canvas.style.height = S + 'px';
   const ctx = canvas.getContext('2d');
-  ctx.scale(d, d);
 
   // Route points
   const pts = [];
