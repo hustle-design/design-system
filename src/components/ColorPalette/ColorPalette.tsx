@@ -1,4 +1,4 @@
-import React from 'react';
+import type {} from 'react';
 import { colors } from '../../tokens';
 
 type ColorGroup = keyof typeof colors;

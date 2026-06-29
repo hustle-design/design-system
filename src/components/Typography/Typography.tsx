@@ -1,17 +1,14 @@
 import React from 'react';
+import type { JSX } from 'react';
 import { fontFamily, typography } from '../../tokens';
 
 type Category = keyof typeof typography;
 type Scale<C extends Category> = keyof (typeof typography)[C];
 
 export interface TypographyProps<C extends Category = Category> {
-  /** 타이포그래피 카테고리 */
   category: C;
-  /** 스케일 (카테고리 내 세부 항목) */
   scale: Scale<C>;
-  /** 표시할 텍스트 */
   children: React.ReactNode;
-  /** 렌더링할 HTML 태그 */
   as?: keyof JSX.IntrinsicElements;
   /** 텍스트 색상 */
   color?: string;
@@ -23,7 +20,7 @@ export function Typography<C extends Category>({
   category,
   scale,
   children,
-  as: Tag = 'span',
+  as: Tag = 'span' as keyof JSX.IntrinsicElements,
   color = '#1a1c20',
   className,
   style,
@@ -34,8 +31,9 @@ export function Typography<C extends Category>({
     lineHeight: string;
   };
 
+  const El = Tag as React.ElementType;
   return (
-    <Tag
+    <El
       className={className}
       style={{
         fontFamily,
@@ -48,6 +46,6 @@ export function Typography<C extends Category>({
       }}
     >
       {children}
-    </Tag>
+    </El>
   );
 }

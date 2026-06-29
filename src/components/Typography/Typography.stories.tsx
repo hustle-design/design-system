@@ -1,8 +1,11 @@
+import type { CSSProperties } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { typography } from '../../tokens';
-import { Typography } from './Typography';
+import { Typography, type TypographyProps } from './Typography';
 
-const meta: Meta<typeof Typography> = {
+type TypographyStoryProps = TypographyProps<'heading'>;
+
+const meta: Meta<TypographyStoryProps> = {
   title: 'Foundation/Typography',
   component: Typography,
   parameters: {
@@ -17,7 +20,7 @@ const meta: Meta<typeof Typography> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Typography>;
+type Story = StoryObj<TypographyStoryProps>;
 
 // ── Single token preview ──────────────────────────────────────
 export const Default: Story = {
@@ -25,12 +28,11 @@ export const Default: Story = {
     category: 'heading',
     scale: 'H1_Bold',
     children: '안녕하세요, 디자인 시스템입니다.',
-    as: 'h1',
   },
 };
 
 // ── Full scale table ──────────────────────────────────────────
-const ROW_STYLE: React.CSSProperties = {
+const ROW_STYLE: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 24,
@@ -38,7 +40,7 @@ const ROW_STYLE: React.CSSProperties = {
   borderBottom: '1px solid #eeeff1',
 };
 
-const LABEL_STYLE: React.CSSProperties = {
+const LABEL_STYLE: CSSProperties = {
   width: 200,
   fontFamily: 'monospace',
   fontSize: 11,
@@ -46,7 +48,7 @@ const LABEL_STYLE: React.CSSProperties = {
   flexShrink: 0,
 };
 
-const META_STYLE: React.CSSProperties = {
+const META_STYLE: CSSProperties = {
   width: 160,
   fontFamily: 'monospace',
   fontSize: 11,
