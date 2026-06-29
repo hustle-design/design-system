@@ -1,0 +1,3660 @@
+<title>산책</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Design System Tokens ───────────────────────────────────── */
+:root {
+  /* Neutral */
+  --neutral-0:   #000000;
+  --neutral-100: #1a1c20;
+  --neutral-200: #2a3038;
+  --neutral-300: #3e464c;
+  --neutral-400: #565d6d;
+  --neutral-500: #868b94;
+  --neutral-600: #b1b3bb;
+  --neutral-700: #d2d3d9;
+  --neutral-750: #dddee4;
+  --neutral-800: #eeeff1;
+  --neutral-850: #f3f4f5;
+  --neutral-900: #f7f8f9;
+  --neutral-950: #fbfbfc;
+  --neutral-1000: #ffffff;
+
+  /* Green */
+  --green-100: #00745f;
+  --green-200: #079171;
+  --green-300: #10ab7d;
+  --green-400: #42c593;
+  --green-500: #7ddcb3;
+  --green-600: #b9e9d2;
+  --green-700: #d9f6e9;
+  --green-800: #edfaf6;
+
+  /* Red */
+  --red-100: #ca1d13;
+  --red-200: #fa342c;
+  --red-300: #ff625e;
+  --red-400: #fe928d;
+  --red-700: #fde7e7;
+  --red-800: #fdf0f0;
+
+  /* Blue */
+  --blue-100: #135fcd;
+  --blue-200: #217cf9;
+  --blue-300: #5e98fe;
+  --blue-700: #e2edfc;
+  --blue-800: #eff6ff;
+
+  /* Typography scale (font-size px / font-weight / line-height) */
+  --font: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+  --D1: 700 36px/150% var(--font);
+  --D2: 700 32px/145% var(--font);
+  --H1: 700 28px/140% var(--font);
+  --H2: 700 26px/140% var(--font);
+  --H3: 700 24px/140% var(--font);
+  --H4: 700 22px/140% var(--font);
+  --H5: 700 20px/135% var(--font);
+  --B1: 500 18px/125% var(--font);
+  --B2: 500 16px/125% var(--font);
+  --B3: 500 15px/125% var(--font);
+  --B4: 500 14px/125% var(--font);
+  --B5: 500 13px/125% var(--font);
+  --B6: 500 12px/125% var(--font);
+  --C1: 500 12px/140% var(--font);
+  --C2: 500 11px/140% var(--font);
+  --P1: 500 16px/140% var(--font);
+  --P2: 500 15px/150% var(--font);
+  --P3: 500 14px/150% var(--font);
+
+  /* ── Semantic aliases (walk app) ──────────────────────────── */
+  --bg:           var(--neutral-900);
+  --surface:      var(--neutral-1000);
+  --surface-2:    var(--neutral-950);
+  --ink:          var(--neutral-100);
+  --ink-2:        var(--neutral-500);
+  --ink-3:        var(--neutral-700);
+  --accent:       var(--neutral-100);
+  --accent-bright:var(--neutral-300);
+  --accent-faint: var(--neutral-850);
+  --amber:        #E07B00;
+  --amber-faint:  #FFF4E0;
+  --blue:         var(--blue-200);
+  --blue-faint:   var(--blue-800);
+  --danger:       var(--red-200);
+  --danger-faint: var(--red-800);
+  --green:        var(--green-300);
+  --green-faint:  var(--green-800);
+
+  /* Radii & shadows */
+  --r-sm: 6px;  --r-md: 12px;  --r-lg: 16px;  --r-xl: 20px;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+}
+
+body {
+  background: var(--neutral-800);
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--B3);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 50px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.06),
+    0 24px 72px rgba(0,0,0,0.20),
+    0 6px 20px rgba(0,0,0,0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+@media (max-width: 420px) {
+  #app { width: 100%; height: 100svh; border-radius: 0; box-shadow: none; }
+  body { align-items: flex-start; }
+}
+
+.status-bar {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px 0 28px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.s-time {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.s-icons { display: flex; align-items: center; gap: 5px; }
+.s-icons svg { display: block; }
+
+#content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.tab-panel {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+}
+.tab-panel.active { display: flex; }
+
+/* ═══════════════════════════════
+   RECORD TAB
+═══════════════════════════════ */
+#tab-record { position: relative; }
+
+#map-wrap { position: absolute; inset: 0; }
+#map-canvas { width: 100%; height: 100%; display: block; }
+
+.stats-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(
+    to top,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,0.97) 55%,
+    rgba(255,255,255,0) 100%
+  );
+  padding: 64px 24px 24px;
+}
+
+/* Course banner */
+.course-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s, transform 0.3s;
+  box-shadow: var(--shadow-sm);
+}
+.course-banner.visible { opacity: 1; transform: translateY(0); }
+.course-banner-icon {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.course-banner-icon svg { width: 15px; height: 15px; fill: white; }
+.course-banner-text { flex: 1; min-width: 0; }
+.course-banner-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+.course-banner-meta {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-top: 2px;
+}
+.course-banner-close {
+  background: var(--bg);
+  border: none;
+  cursor: pointer;
+  color: var(--ink-3);
+  padding: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rec-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.rec-badge.visible { opacity: 1; }
+
+.rec-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--danger);
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.rec-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--danger);
+}
+
+.stats-row {
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 24px;
+  gap: 0;
+}
+
+.stat-item { flex: 1; }
+.stat-item + .stat-item {
+  padding-left: 16px;
+  border-left: 1px solid var(--bg);
+  margin-left: 16px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.stat-value.timer {
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+.stat-unit {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: -0.01em;
+  margin-left: 2px;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+  margin-top: 6px;
+}
+
+.btn-wrap { display: flex; justify-content: center; }
+
+.btn-rec {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease;
+  background: var(--accent);
+  box-shadow: 0 4px 20px rgba(26,28,32,0.28), 0 1px 4px rgba(26,28,32,0.12);
+}
+
+.btn-rec.walking {
+  background: var(--danger);
+  box-shadow: 0 4px 20px rgba(224,61,70,0.32);
+  animation: pulse-rec 2.2s ease-out infinite;
+}
+
+@keyframes pulse-rec {
+  0% { box-shadow: 0 4px 20px rgba(224,61,70,0.32), 0 0 0 0 rgba(224,61,70,0.24); }
+  60% { box-shadow: 0 4px 20px rgba(224,61,70,0.32), 0 0 0 20px rgba(224,61,70,0); }
+  100% { box-shadow: 0 4px 20px rgba(224,61,70,0.32), 0 0 0 0 rgba(224,61,70,0); }
+}
+
+.btn-rec:active { transform: scale(0.90); }
+
+.btn-rec svg {
+  width: 28px; height: 28px;
+  fill: white;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-rec.walking { animation: none; }
+  .rec-dot { animation: none; }
+}
+
+/* ═══════════════════════════════
+   COURSES TAB
+═══════════════════════════════ */
+#tab-courses {
+  background: var(--bg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.courses-header {
+  padding: 16px 20px 4px;
+}
+
+.courses-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.courses-header p {
+  font-size: 14px;
+  color: var(--ink-2);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+/* Filter chips */
+.filter-scroll {
+  display: flex;
+  gap: 6px;
+  padding: 14px 20px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filter-scroll::-webkit-scrollbar { display: none; }
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  border: none;
+  background: var(--surface);
+  color: var(--ink-2);
+  transition: background 0.18s, color 0.18s, transform 0.1s;
+  flex-shrink: 0;
+  letter-spacing: -0.01em;
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-chip:active { transform: scale(0.95); }
+
+.filter-chip.active {
+  background: var(--ink);
+  color: white;
+}
+
+/* Course card */
+.courses-list {
+  padding: 14px 16px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.course-card {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.34,1.2,0.64,1);
+  box-shadow: var(--shadow-sm);
+}
+
+.course-card:active { transform: scale(0.975); }
+
+.course-map-preview {
+  width: 100%;
+  height: 140px;
+  position: relative;
+  overflow: hidden;
+}
+
+.course-map-preview canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Difficulty badge on map */
+.course-diff-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 99px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink-2);
+}
+
+.diff-dots {
+  display: flex;
+  gap: 2.5px;
+}
+
+.diff-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+
+.diff-dot.on { background: var(--ink); }
+.diff-dot.on.hard { background: var(--amber); }
+
+.course-card-body {
+  padding: 14px 16px 16px;
+}
+
+.course-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.course-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.course-area {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-top: 3px;
+  font-weight: 400;
+}
+
+.course-start-btn {
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 99px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.course-start-btn:active { transform: scale(0.93); opacity: 0.85; }
+
+.course-stats-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.course-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.course-stat svg {
+  width: 13px; height: 13px;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+
+.course-stat-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.course-stat-unit {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+/* Tags */
+.course-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.course-tag {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 99px;
+  letter-spacing: -0.01em;
+}
+
+.course-tag.green { background: var(--green-faint); color: var(--green); }
+.course-tag.blue { background: var(--blue-faint); color: var(--blue); }
+.course-tag.amber { background: var(--amber-faint); color: var(--amber); }
+
+/* ═══════════════════════════════
+   GOALS TAB
+═══════════════════════════════ */
+#tab-goals {
+  background: var(--bg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-header {
+  padding: 16px 20px 12px;
+}
+
+.tab-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.tab-header p {
+  font-size: 14px;
+  color: var(--ink-2);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.goal-card {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  padding: 20px;
+  margin: 0 16px 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.goal-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.goal-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.goal-edit-btn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ring-row { display: flex; align-items: center; gap: 20px; }
+.ring-info { flex: 1; }
+
+.ring-count {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ring-count .unit {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ink-2);
+  letter-spacing: 0;
+}
+
+.ring-goal-text {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-top: 5px;
+}
+
+.ring-chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--green-faint);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 99px;
+  margin-top: 10px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.ring-chip.amber { background: var(--amber-faint); color: var(--amber); }
+
+.week-section {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bg);
+}
+
+.week-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.week-bars {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  height: 48px;
+}
+
+.day-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+}
+
+.day-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.day-fill {
+  width: 100%;
+  border-radius: 4px 4px 4px 4px;
+  min-height: 4px;
+  background: var(--bg);
+  transition: background 0.3s;
+}
+
+.day-fill.met { background: #C5CDD6; }
+.day-fill.today { background: var(--ink); }
+
+.day-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.day-name.today { color: var(--ink); }
+
+/* ═══════════════════════════════
+   HISTORY TAB
+═══════════════════════════════ */
+#tab-history {
+  background: var(--bg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.history-list {
+  padding: 0 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-card {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  padding: 16px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.history-card:active { transform: scale(0.98); }
+
+.hist-thumb {
+  width: 60px; height: 60px;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+.hist-thumb canvas { width: 100%; height: 100%; display: block; }
+.hist-info { flex: 1; min-width: 0; }
+
+.hist-date {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: -0.01em;
+}
+
+.hist-stats {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.hist-main {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.hist-unit {
+  font-size: 13px;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.hist-secondary {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+
+.hist-arrow { color: var(--ink-3); flex-shrink: 0; }
+
+.history-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--ink-3);
+  gap: 8px;
+}
+
+.history-empty p {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════ */
+#nav {
+  height: 82px;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  flex-shrink: 0;
+}
+
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-3);
+  padding: 0 0 8px;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.nav-btn.active { color: var(--ink); }
+
+.nav-btn.active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 24px; height: 2.5px;
+  border-radius: 0 0 2px 2px;
+  background: var(--ink);
+}
+
+.nav-btn svg { width: 22px; height: 22px; display: block; }
+
+.nav-btn-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ═══════════════════════════════
+   PEDOMETER WIDGET
+═══════════════════════════════ */
+.pedo-widget {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 5;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--r-xl);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pedo-ring-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.pedo-ring-wrap svg {
+  width: 56px;
+  height: 56px;
+  transform: rotate(-90deg);
+}
+
+.pedo-ring-bg { fill: none; stroke: var(--accent-faint); stroke-width: 5; }
+.pedo-ring-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 138.2;
+  stroke-dashoffset: 138.2;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.pedo-ring-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pedo-ring-icon svg {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+  transform: none;
+}
+
+.pedo-info { flex: 1; min-width: 0; }
+
+.pedo-steps {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.pedo-steps-unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+.pedo-bar-wrap {
+  height: 3px;
+  background: var(--accent-faint);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.pedo-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width 0.5s ease;
+  min-width: 3px;
+}
+
+.pedo-goal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.pedo-goal-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.pedo-sensor-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  opacity: 0.4;
+  transition: background 0.3s, opacity 0.3s;
+}
+
+.pedo-sensor-dot.active {
+  background: #22C55E;
+  opacity: 1;
+  animation: pedo-blink 2s ease-in-out infinite;
+}
+
+@keyframes pedo-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ═══════════════════════════════
+   SAVE ROUTE SHEET
+═══════════════════════════════ */
+#save-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+#save-sheet .course-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  transition: background 0.35s ease;
+}
+
+#save-sheet.open .course-sheet-backdrop {
+  background: rgba(0,0,0,0.4);
+  pointer-events: all;
+}
+
+#save-sheet .course-sheet-panel {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-radius: 28px 28px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.4,0,0.2,1);
+  pointer-events: all;
+  padding-bottom: 32px;
+}
+
+#save-sheet.open .course-sheet-panel {
+  transform: translateY(0);
+}
+
+.save-sheet-head {
+  padding: 20px 22px 0;
+}
+
+.save-sheet-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.save-sheet-sub {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.save-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 18px 22px;
+  padding: 14px;
+  background: var(--bg);
+  border-radius: var(--r-lg);
+}
+
+.save-thumb {
+  width: 56px; height: 56px;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--accent-faint);
+}
+
+.save-thumb canvas { width: 100%; height: 100%; display: block; }
+
+.save-preview-stats { flex: 1; }
+
+.save-preview-main {
+  font-size: 20px;
+  font-weight: 200;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.save-preview-sec {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 3px;
+}
+
+/* Name input */
+.save-input-wrap {
+  margin: 0 22px 20px;
+  position: relative;
+}
+
+.save-input {
+  width: 100%;
+  height: 52px;
+  background: var(--bg);
+  border: 2px solid transparent;
+  border-radius: var(--r-lg);
+  padding: 0 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+
+.save-input:focus { border-color: var(--accent); background: var(--surface); }
+.save-input::placeholder { color: var(--ink-3); font-weight: 400; }
+
+.save-actions {
+  display: flex;
+  gap: 10px;
+  padding: 0 22px;
+}
+
+.save-btn-primary {
+  flex: 1;
+  height: 54px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 99px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  transition: opacity 0.15s, transform 0.12s;
+}
+
+.save-btn-primary:active { transform: scale(0.97); opacity: 0.88; }
+
+.save-btn-skip {
+  height: 54px;
+  padding: 0 20px;
+  background: var(--bg);
+  color: var(--ink-2);
+  border: none;
+  border-radius: 99px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* My courses section */
+.my-courses-section {
+  padding: 14px 14px 0;
+}
+
+.my-courses-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 2px;
+}
+
+.my-courses-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.my-courses-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: var(--bg);
+  padding: 3px 9px;
+  border-radius: 99px;
+}
+
+.my-course-card {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: transform 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+
+.my-course-card:active { transform: scale(0.98); }
+
+.my-course-thumb {
+  width: 56px; height: 56px;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--accent-faint);
+}
+
+.my-course-thumb canvas { width: 100%; height: 100%; display: block; }
+
+.my-course-info { flex: 1; min-width: 0; }
+
+.my-course-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-course-meta {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.my-course-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.my-course-start {
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 99px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: -0.01em;
+}
+
+.my-course-start:active { transform: scale(0.94); }
+
+.my-course-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink-3);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.section-divider {
+  height: 1px;
+  background: var(--bg);
+  margin: 14px 14px 14px;
+}
+
+/* ═══════════════════════════════
+   COURSE DETAIL SHEET
+═══════════════════════════════ */
+#course-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.course-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  transition: background 0.35s ease;
+}
+
+#course-sheet.open .course-sheet-backdrop {
+  background: rgba(0,0,0,0.36);
+  pointer-events: all;
+}
+
+.course-sheet-panel {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: all;
+  overflow: hidden;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+#course-sheet.open .course-sheet-panel {
+  transform: translateY(0);
+}
+
+/* Drag handle */
+.sheet-handle {
+  width: 36px; height: 4px;
+  border-radius: 2px;
+  background: var(--ink-3);
+  opacity: 0.3;
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+
+/* Map preview — large */
+.sheet-map {
+  width: 100%;
+  height: 200px;
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.sheet-map canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Scrollable body */
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 22px 0;
+}
+
+.sheet-area-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+
+.sheet-name {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.sheet-desc {
+  font-size: 15px;
+  color: var(--ink-2);
+  line-height: 1.55;
+  margin-bottom: 20px;
+}
+
+.sheet-stats {
+  display: flex;
+  gap: 0;
+  background: var(--bg);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.sheet-stat {
+  flex: 1;
+  padding: 14px 0;
+  text-align: center;
+  position: relative;
+}
+
+.sheet-stat + .sheet-stat::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 16%; bottom: 16%;
+  width: 1px;
+  background: var(--ink-3);
+  opacity: 0.2;
+}
+
+.sheet-stat-val {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.sheet-stat-unit {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.sheet-stat-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 5px;
+}
+
+.sheet-diff-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.sheet-diff-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  opacity: 0.25;
+}
+
+.sheet-diff-dot.on { background: var(--ink); opacity: 1; }
+
+.sheet-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+/* Bottom action */
+.sheet-actions {
+  padding: 16px 22px 32px;
+  flex-shrink: 0;
+  display: flex;
+  gap: 10px;
+}
+
+.sheet-btn-start {
+  flex: 1;
+  height: 56px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 99px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: -0.02em;
+  transition: opacity 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.sheet-btn-start:active { transform: scale(0.96); opacity: 0.9; }
+
+.sheet-btn-start svg { width: 17px; height: 17px; fill: white; }
+
+.sheet-btn-close {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.sheet-btn-close:active { background: var(--ink-3); }
+
+.sheet-btn-close svg { width: 18px; height: 18px; color: var(--ink-2); }
+
+/* ═══════════════════════════════
+   ONBOARDING
+═══════════════════════════════ */
+#onboarding {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#onboarding.hidden {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* Steps container — slides horizontally */
+.ob-slides {
+  flex: 1;
+  display: flex;
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 0;
+}
+
+.ob-slide {
+  min-width: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 28px;
+  flex-shrink: 0;
+}
+
+/* Step 1 — Welcome */
+.ob-welcome-art {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.ob-map-circle {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.ob-map-circle canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Pulse rings */
+.ob-pulse-rings {
+  position: absolute;
+  inset: -40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.ob-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(26,28,32,0.1);
+  animation: ob-ring-pulse 3s ease-out infinite;
+}
+
+.ob-ring:nth-child(1) { width: 240px; height: 240px; animation-delay: 0s; }
+.ob-ring:nth-child(2) { width: 290px; height: 290px; animation-delay: 0.8s; }
+.ob-ring:nth-child(3) { width: 340px; height: 340px; animation-delay: 1.6s; }
+
+@keyframes ob-ring-pulse {
+  0% { opacity: 0; transform: scale(0.85); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-ring { animation: none; opacity: 0.15; }
+}
+
+.ob-welcome-body {
+  padding-bottom: 32px;
+}
+
+.ob-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-bright);
+  margin-bottom: 10px;
+}
+
+.ob-headline {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  line-height: 1.15;
+  text-wrap: balance;
+  margin-bottom: 12px;
+}
+
+.ob-sub {
+  font-size: 16px;
+  color: var(--ink-2);
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+/* Step 2 — Goal */
+.ob-step-head {
+  padding-top: 28px;
+  margin-bottom: 32px;
+}
+
+.ob-step-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-bright);
+  margin-bottom: 8px;
+}
+
+.ob-step-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  line-height: 1.15;
+  text-wrap: balance;
+  margin-bottom: 6px;
+}
+
+.ob-step-desc {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+/* Goal picker */
+.ob-goal-display {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 28px;
+}
+
+.ob-goal-num {
+  font-size: 64px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ob-goal-unit {
+  font-size: 18px;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+.ob-goal-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.ob-preset {
+  background: var(--bg);
+  border: 2px solid transparent;
+  border-radius: var(--r-lg);
+  padding: 16px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ob-preset.selected {
+  border-color: var(--ink);
+  background: var(--surface);
+}
+
+.ob-preset-val {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.ob-preset-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+  margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+
+.ob-preset.selected .ob-preset-lbl { color: var(--accent); }
+
+.ob-slider-wrap {
+  position: relative;
+  padding: 6px 0;
+}
+
+.ob-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--accent-faint);
+  outline: none;
+  cursor: pointer;
+}
+
+.ob-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 2px 8px rgba(26,28,32,0.2);
+  cursor: pointer;
+}
+
+/* Step 3 — Theme */
+.ob-theme-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ob-theme-card {
+  background: var(--bg);
+  border: 2px solid transparent;
+  border-radius: var(--r-lg);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ob-theme-card.selected {
+  border-color: var(--ink);
+  background: var(--surface);
+}
+
+.ob-theme-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.ob-theme-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ob-theme-desc {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.ob-theme-card.selected .ob-theme-desc { color: var(--accent); }
+
+/* Bottom bar */
+.ob-bottom {
+  padding: 20px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+/* Progress dots */
+.ob-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ob-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  opacity: 0.3;
+  transition: opacity 0.25s, width 0.25s;
+}
+
+.ob-dot.active {
+  width: 20px;
+  border-radius: 3px;
+  opacity: 1;
+  background: var(--accent);
+}
+
+/* CTA button */
+.ob-cta {
+  width: 100%;
+  height: 56px;
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: 99px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: -0.02em;
+  transition: opacity 0.15s, transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ob-cta:active { transform: scale(0.96); opacity: 0.88; }
+
+.ob-cta svg { width: 18px; height: 18px; fill: white; }
+
+.ob-skip {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: var(--ink-3);
+  cursor: pointer;
+  padding: 4px 0;
+  text-align: center;
+  width: 100%;
+}
+</style>
+
+<div id="app">
+
+  <!-- ══════════════════════════════
+       ONBOARDING OVERLAY
+  ══════════════════════════════ -->
+  <div id="onboarding">
+
+    <div class="ob-slides" id="ob-slides">
+
+      <!-- Step 1: Welcome -->
+      <div class="ob-slide">
+        <div class="ob-welcome-art">
+          <div class="ob-pulse-rings">
+            <div class="ob-ring"></div>
+            <div class="ob-ring"></div>
+            <div class="ob-ring"></div>
+          </div>
+          <div class="ob-map-circle">
+            <canvas id="ob-map-canvas"></canvas>
+          </div>
+        </div>
+        <div class="ob-welcome-body">
+          <div class="ob-eyebrow">산책 기록 앱</div>
+          <div class="ob-headline">오늘도 한 걸음,<br>가볍게 시작해요</div>
+          <div class="ob-sub">걷는 거리와 시간을 기록하고,<br>나에게 맞는 코스를 찾아보세요.</div>
+        </div>
+      </div>
+
+      <!-- Step 2: Goal -->
+      <div class="ob-slide">
+        <div class="ob-step-head">
+          <div class="ob-step-label">목표 설정</div>
+          <div class="ob-step-title">하루에 몇 걸음<br>걷고 싶으세요?</div>
+          <div class="ob-step-desc">나중에 언제든 바꿀 수 있어요</div>
+        </div>
+        <div class="ob-goal-display">
+          <span class="ob-goal-num" id="ob-goal-num">6,000</span>
+          <span class="ob-goal-unit">보</span>
+        </div>
+        <div class="ob-goal-presets">
+          <div class="ob-preset" data-val="3000" onclick="selectPreset(this)">
+            <div class="ob-preset-val">3,000</div>
+            <div class="ob-preset-lbl">가볍게</div>
+          </div>
+          <div class="ob-preset selected" data-val="6000" onclick="selectPreset(this)">
+            <div class="ob-preset-val">6,000</div>
+            <div class="ob-preset-lbl">적당히</div>
+          </div>
+          <div class="ob-preset" data-val="10000" onclick="selectPreset(this)">
+            <div class="ob-preset-val">10,000</div>
+            <div class="ob-preset-lbl">열심히</div>
+          </div>
+        </div>
+        <div class="ob-slider-wrap">
+          <input class="ob-slider" type="range" id="ob-slider"
+            min="1000" max="15000" step="500" value="6000"
+            oninput="syncSlider(this.value)">
+        </div>
+      </div>
+
+      <!-- Step 3: Theme -->
+      <div class="ob-slide">
+        <div class="ob-step-head">
+          <div class="ob-step-label">코스 취향</div>
+          <div class="ob-step-title">주로 어디서<br>걷게 될 것 같아요?</div>
+          <div class="ob-step-desc">복수 선택 가능 · 관련 코스를 먼저 보여드려요</div>
+        </div>
+        <div class="ob-theme-grid">
+          <div class="ob-theme-card" data-theme="직장 근처" onclick="toggleTheme(this)">
+            <div class="ob-theme-icon">🏢</div>
+            <div class="ob-theme-name">직장 근처</div>
+            <div class="ob-theme-desc">점심시간, 퇴근길 짧은 산책</div>
+          </div>
+          <div class="ob-theme-card" data-theme="집 근처" onclick="toggleTheme(this)">
+            <div class="ob-theme-icon">🏡</div>
+            <div class="ob-theme-name">집 근처</div>
+            <div class="ob-theme-desc">아침·저녁 동네 한 바퀴</div>
+          </div>
+          <div class="ob-theme-card" data-theme="강·하천" onclick="toggleTheme(this)">
+            <div class="ob-theme-icon">🌊</div>
+            <div class="ob-theme-name">강·하천</div>
+            <div class="ob-theme-desc">탁 트인 수변 코스</div>
+          </div>
+          <div class="ob-theme-card" data-theme="공원" onclick="toggleTheme(this)">
+            <div class="ob-theme-icon">🌳</div>
+            <div class="ob-theme-name">공원</div>
+            <div class="ob-theme-desc">잔디밭, 나무 그늘 아래</div>
+          </div>
+          <div class="ob-theme-card" data-theme="산·숲" onclick="toggleTheme(this)">
+            <div class="ob-theme-icon">⛰️</div>
+            <div class="ob-theme-name">산·숲</div>
+            <div class="ob-theme-desc">본격 등산·트레일</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ob-slides -->
+
+    <div class="ob-bottom">
+      <div class="ob-dots" id="ob-dots">
+        <div class="ob-dot active"></div>
+        <div class="ob-dot"></div>
+        <div class="ob-dot"></div>
+      </div>
+      <button class="ob-cta" id="ob-cta" onclick="obNext()">
+        <span id="ob-cta-label">시작하기</span>
+        <svg viewBox="0 0 24 24"><path d="M13.5 4.5L21 12l-7.5 7.5M3 12h18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </button>
+      <button class="ob-skip" id="ob-skip" onclick="finishOnboarding()">건너뛰기</button>
+    </div>
+
+  </div><!-- /onboarding -->
+
+  <div class="status-bar">
+    <span class="s-time" id="clock">9:41</span>
+    <div class="s-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none" opacity="0.8">
+        <rect x="0" y="3" width="3" height="9" rx="1" fill="currentColor"/>
+        <rect x="4.5" y="2" width="3" height="10" rx="1" fill="currentColor"/>
+        <rect x="9" y="0" width="3" height="12" rx="1" fill="currentColor"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor" opacity="0.3"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" opacity="0.8">
+        <path d="M8 2.5C10.2 2.5 12.1 3.4 13.5 4.9L15 3.4C13.1 1.3 10.7 0 8 0C5.3 0 2.9 1.3 1 3.4L2.5 4.9C3.9 3.4 5.8 2.5 8 2.5Z"/>
+        <path d="M8 5.5C9.4 5.5 10.6 6.1 11.5 7L13 5.5C11.7 4.1 10 3.3 8 3.3C6 3.3 4.3 4.1 3 5.5L4.5 7C5.4 6.1 6.6 5.5 8 5.5Z"/>
+        <circle cx="8" cy="10" r="2"/>
+      </svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none" opacity="0.8">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor"/>
+        <rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/>
+        <path d="M23 4V8C24.1 7.5 24.1 4.5 23 4Z" fill="currentColor" opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- ── RECORD TAB ── -->
+    <div class="tab-panel active" id="tab-record">
+      <div id="map-wrap">
+        <canvas id="map-canvas"></canvas>
+      </div>
+
+      <!-- 만보기 위젯 -->
+      <div class="pedo-widget">
+        <div class="pedo-ring-wrap">
+          <svg viewBox="0 0 56 56">
+            <circle class="pedo-ring-bg" cx="28" cy="28" r="22"/>
+            <circle class="pedo-ring-fill" id="pedo-ring" cx="28" cy="28" r="22"/>
+          </svg>
+          <div class="pedo-ring-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 4a1 1 0 1 0 2 0 1 1 0 0 0-2 0"/>
+              <path d="M7.5 17.5L9 13l3 2 2.5-5"/>
+              <path d="M9 13l-2 5"/>
+              <path d="M14 8l1.5 3-3.5 2"/>
+            </svg>
+          </div>
+        </div>
+        <div class="pedo-info">
+          <div>
+            <span class="pedo-steps" id="pedo-steps">3,124</span>
+            <span class="pedo-steps-unit"> 보</span>
+          </div>
+          <div class="pedo-bar-wrap">
+            <div class="pedo-bar-fill" id="pedo-bar" style="width:52%"></div>
+          </div>
+          <div class="pedo-goal-row">
+            <span class="pedo-goal-text" id="pedo-goal-text">목표 6,000보 · 52%</span>
+            <div class="pedo-sensor-dot" id="pedo-sensor-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-overlay">
+        <!-- Active course banner -->
+        <div class="course-banner" id="course-banner">
+          <div class="course-banner-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5s2.5 1.1 2.5 2.5S13.4 11.5 12 11.5z"/></svg>
+          </div>
+          <div class="course-banner-text">
+            <div class="course-banner-name" id="banner-name">—</div>
+            <div class="course-banner-meta" id="banner-meta">—</div>
+          </div>
+          <button class="course-banner-close" onclick="clearActiveCourse()" aria-label="코스 해제">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="rec-badge" id="rec-badge">
+          <div class="rec-dot"></div>
+          <span class="rec-label">기록 중</span>
+        </div>
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-value timer" id="timer-display">00:00</div>
+            <div class="stat-label">시간</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="dist-display">0.00</div>
+            <div class="stat-unit">km</div>
+            <div class="stat-label">거리</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="steps-display">0</div>
+            <div class="stat-unit">보</div>
+            <div class="stat-label">걸음</div>
+          </div>
+        </div>
+        <div class="btn-wrap">
+          <button class="btn-rec" id="btn-rec" aria-label="산책 시작">
+            <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+            <svg id="icon-stop" viewBox="0 0 24 24" style="display:none"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COURSES TAB ── -->
+    <div class="tab-panel" id="tab-courses">
+      <div class="courses-header">
+        <h1>코스</h1>
+        <p>추천 코스와 내가 걸은 길</p>
+      </div>
+
+      <!-- 나의 코스 -->
+      <div class="my-courses-section" id="my-courses-section" style="display:none">
+        <div class="my-courses-header">
+          <span class="my-courses-label">나의 코스</span>
+          <span class="my-courses-count" id="my-courses-count">0</span>
+        </div>
+        <div id="my-courses-list"></div>
+        <div class="section-divider"></div>
+        <div class="my-courses-header" style="margin-bottom:10px;">
+          <span class="my-courses-label">추천 코스</span>
+        </div>
+      </div>
+
+      <div class="filter-scroll" id="filter-chips"></div>
+      <div class="courses-list" id="courses-list"></div>
+    </div>
+
+    <!-- ── GOALS TAB ── -->
+    <div class="tab-panel" id="tab-goals">
+      <div class="tab-header">
+        <h1>목표</h1>
+        <p>꾸준히 걷는 것이 가장 좋은 운동</p>
+      </div>
+      <div class="goal-card">
+        <div class="goal-card-head">
+          <div class="goal-card-title">오늘 목표</div>
+          <button class="goal-edit-btn">수정</button>
+        </div>
+        <div class="ring-row">
+          <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="38" fill="none" stroke="#EBEBEC" stroke-width="9"/>
+            <circle cx="45" cy="45" r="38" fill="none" stroke="#1A1C20" stroke-width="9"
+              stroke-linecap="round" stroke-dasharray="238.76"
+              id="daily-ring" stroke-dashoffset="114.6"
+              transform="rotate(-90 45 45)"/>
+          </svg>
+          <div class="ring-info">
+            <div class="ring-count" id="daily-count">3,124 <span class="unit">보</span></div>
+            <div class="ring-goal-text">목표 6,000보</div>
+            <div class="ring-chip" id="daily-chip">52%</div>
+          </div>
+        </div>
+        <div class="week-section">
+          <div class="week-label">이번 주</div>
+          <div class="week-bars" id="week-bars"></div>
+        </div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-card-head">
+          <div class="goal-card-title">주간 목표</div>
+          <button class="goal-edit-btn">수정</button>
+        </div>
+        <div class="ring-row">
+          <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="38" fill="none" stroke="#EBEBEC" stroke-width="9"/>
+            <circle cx="45" cy="45" r="38" fill="none" stroke="#1A1C20" stroke-width="9"
+              stroke-linecap="round" stroke-dasharray="238.76"
+              id="weekly-ring" stroke-dashoffset="91.7"
+              transform="rotate(-90 45 45)"/>
+          </svg>
+          <div class="ring-info">
+            <div class="ring-count">18,651 <span class="unit">보</span></div>
+            <div class="ring-goal-text">목표 30,000보 · 5일 남음</div>
+            <div class="ring-chip amber">62%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HISTORY TAB ── -->
+    <div class="tab-panel" id="tab-history">
+      <div class="tab-header">
+        <h1>기록</h1>
+        <p>총 <span id="total-walks">3</span>번의 산책</p>
+      </div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+
+    <!-- ── SAVE ROUTE SHEET ── -->
+    <div id="save-sheet">
+      <div class="course-sheet-backdrop" onclick="closeSaveSheet()"></div>
+      <div class="course-sheet-panel">
+        <div class="sheet-handle"></div>
+        <div class="save-sheet-head">
+          <div class="save-sheet-title">이 길을 저장할까요?</div>
+          <div class="save-sheet-sub">나만의 산책 코스 아카이브에 추가돼요</div>
+        </div>
+        <div class="save-preview-row">
+          <div class="save-thumb"><canvas id="save-thumb-canvas" width="56" height="56"></canvas></div>
+          <div class="save-preview-stats">
+            <div class="save-preview-main" id="save-preview-dist">— km</div>
+            <div class="save-preview-sec" id="save-preview-meta">— · —걸음</div>
+          </div>
+        </div>
+        <div class="save-input-wrap">
+          <input class="save-input" id="save-name-input" type="text"
+            placeholder="코스 이름 (예: 회사 앞 점심 산책)"
+            maxlength="30">
+        </div>
+        <div class="save-actions">
+          <button class="save-btn-primary" onclick="confirmSaveRoute()">저장하기</button>
+          <button class="save-btn-skip" onclick="closeSaveSheet()">건너뛰기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COURSE DETAIL SHEET ── -->
+    <div id="course-sheet">
+      <div class="course-sheet-backdrop" onclick="closeCourseSheet()"></div>
+      <div class="course-sheet-panel">
+        <div class="sheet-handle"></div>
+        <div class="sheet-map">
+          <canvas id="sheet-map-canvas"></canvas>
+        </div>
+        <div class="sheet-body">
+          <div class="sheet-area-tag" id="sheet-area">—</div>
+          <div class="sheet-name" id="sheet-name">—</div>
+          <div class="sheet-desc" id="sheet-desc">—</div>
+          <div class="sheet-stats">
+            <div class="sheet-stat">
+              <div class="sheet-stat-val" id="sheet-dist">—</div>
+              <div class="sheet-stat-unit">km</div>
+              <div class="sheet-stat-lbl">거리</div>
+            </div>
+            <div class="sheet-stat">
+              <div class="sheet-stat-val" id="sheet-dur">—</div>
+              <div class="sheet-stat-unit">분</div>
+              <div class="sheet-stat-lbl">예상 시간</div>
+            </div>
+            <div class="sheet-stat">
+              <div id="sheet-diff-dots" class="sheet-diff-row" style="justify-content:center;margin-top:3px;"></div>
+              <div class="sheet-stat-lbl" id="sheet-diff-label" style="margin-top:8px;">난이도</div>
+            </div>
+          </div>
+          <div class="sheet-tags" id="sheet-tags"></div>
+        </div>
+        <div class="sheet-actions">
+          <button class="sheet-btn-start" onclick="startCourseFromSheet()">
+            <svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+            기록 시작
+          </button>
+          <button class="sheet-btn-close" onclick="closeCourseSheet()" aria-label="닫기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <nav id="nav" role="navigation" aria-label="메인 메뉴">
+    <button class="nav-btn active" id="nav-record" onclick="switchTab('record')" aria-label="기록">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>
+      </svg>
+      <span class="nav-btn-label">기록</span>
+    </button>
+    <button class="nav-btn" id="nav-courses" onclick="switchTab('courses')" aria-label="추천 코스">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12h4l3-9 4 18 3-9h4"/>
+      </svg>
+      <span class="nav-btn-label">코스</span>
+    </button>
+    <button class="nav-btn" id="nav-goals" onclick="switchTab('goals')" aria-label="목표">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+      </svg>
+      <span class="nav-btn-label">목표</span>
+    </button>
+    <button class="nav-btn" id="nav-history" onclick="switchTab('history')" aria-label="히스토리">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 8v4l3 3"/>
+        <circle cx="12" cy="12" r="9"/>
+      </svg>
+      <span class="nav-btn-label">히스토리</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+/* ═══════════════════════════════
+   ONBOARDING
+═══════════════════════════════ */
+/* ═══════════════════════════════
+   PEDOMETER ENGINE
+═══════════════════════════════ */
+const pedo = {
+  totalSteps: 3124,
+  sessionSteps: 0,
+  sensorActive: false,
+  lastMag: 0,
+  lastPeak: 0,
+  threshold: 11.5,
+  minInterval: 250,
+};
+
+const PEDO_CIRCUMFERENCE = 2 * Math.PI * 22;
+
+function updatePedoUI() {
+  const goal = state.dailyGoal;
+  const pct = Math.min(pedo.totalSteps / goal, 1);
+  document.getElementById('pedo-steps').textContent = pedo.totalSteps.toLocaleString('ko-KR');
+  document.getElementById('pedo-bar').style.width = (pct * 100) + '%';
+  document.getElementById('pedo-goal-text').textContent =
+    `목표 ${goal.toLocaleString('ko-KR')}보 · ${Math.round(pct * 100)}%`;
+  document.getElementById('pedo-ring').style.strokeDashoffset =
+    PEDO_CIRCUMFERENCE * (1 - pct);
+}
+
+function initPedometer() {
+  if (typeof DeviceMotionEvent !== 'undefined' &&
+      typeof DeviceMotionEvent.requestPermission === 'function') {
+    document.getElementById('pedo-sensor-dot').addEventListener('click', () => {
+      DeviceMotionEvent.requestPermission()
+        .then(r => { if (r === 'granted') listenMotion(); })
+        .catch(() => {});
+    }, { once: true });
+  } else if (typeof DeviceMotionEvent !== 'undefined') {
+    listenMotion();
+  }
+  updatePedoUI();
+}
+
+function listenMotion() {
+  window.addEventListener('devicemotion', onMotion, { passive: true });
+  pedo.sensorActive = true;
+  document.getElementById('pedo-sensor-dot').classList.add('active');
+}
+
+function onMotion(e) {
+  const a = e.accelerationIncludingGravity;
+  if (!a) return;
+  const mag = Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+  if (pedo.lastMag < pedo.threshold && mag >= pedo.threshold) {
+    const now = Date.now();
+    if (now - pedo.lastPeak > pedo.minInterval) {
+      pedo.lastPeak = now;
+      pedo.totalSteps++;
+      pedo.sessionSteps++;
+      if (state.isWalking) {
+        state.steps = pedo.sessionSteps;
+        document.getElementById('steps-display').textContent =
+          state.steps.toLocaleString('ko-KR');
+      }
+      updatePedoUI();
+    }
+  }
+  pedo.lastMag = mag;
+}
+
+let obStep = 0;
+let obGoal = 6000;
+let obThemes = new Set();
+
+function obDrawWelcomeMap() {
+  const canvas = document.getElementById('ob-map-canvas');
+  if (!canvas) return;
+  const d = window.devicePixelRatio || 1;
+  const S = 220;
+  canvas.width = S * d;
+  canvas.height = S * d;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(d, d);
+
+  // Terrain bg
+  ctx.fillStyle = '#C8DCC8';
+  ctx.fillRect(0, 0, S, S);
+
+  // City blocks
+  ctx.fillStyle = '#B8CEB8';
+  [[0,0,S*.28,S*.3],[S*.36,0,S*.26,S*.3],[S*.7,0,S*.3,S*.3],
+   [0,S*.38,S*.28,S*.26],[S*.7,S*.38,S*.3,S*.26],
+   [0,S*.72,S*.42,S*.28],[S*.52,S*.72,S*.48,S*.28]].forEach(([x,y,w,h])=>ctx.fillRect(x,y,w,h));
+
+  // Park
+  ctx.fillStyle = '#A4C4A4';
+  ctx.fillRect(S*.36, S*.38, S*.26, S*.26);
+  ctx.fillStyle = '#8CAE8C';
+  [[S*.42,S*.44],[S*.5,S*.49],[S*.44,S*.56],[S*.54,S*.44],[S*.57,S*.53]].forEach(([tx,ty])=>{
+    ctx.beginPath(); ctx.arc(tx, ty, 6, 0, Math.PI*2); ctx.fill();
+  });
+
+  // Roads
+  ctx.fillStyle = '#DCE8DC';
+  [S*.3, S*.64].forEach(ry => ctx.fillRect(0, ry, S, S*.06));
+  [S*.28, S*.56].forEach(rx => ctx.fillRect(rx, 0, S*.06, S));
+
+  // Route — a gentle figure-8 style loop
+  const pts = [];
+  for (let i = 0; i <= 80; i++) {
+    const t = (i / 80) * Math.PI * 2;
+    pts.push({
+      x: S*.5 + Math.cos(t) * S*.28 + Math.sin(t*2) * S*.06,
+      y: S*.48 + Math.sin(t) * S*.22 + Math.sin(t*3) * S*.03,
+    });
+  }
+
+  // Shadow
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(43,101,64,0.15)';
+  ctx.lineWidth = 9;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.moveTo(pts[0].x, pts[0].y);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+
+  // Trail
+  ctx.beginPath();
+  ctx.strokeStyle = '#1A1C20';
+  ctx.lineWidth = 4;
+  ctx.moveTo(pts[0].x, pts[0].y);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.stroke();
+
+  // Current position dot
+  const last = pts[pts.length - 1];
+  ctx.beginPath();
+  ctx.fillStyle = '#1A1C20';
+  ctx.arc(last.x, last.y, 8, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function selectPreset(el) {
+  document.querySelectorAll('.ob-preset').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  const val = parseInt(el.dataset.val);
+  obGoal = val;
+  document.getElementById('ob-goal-num').textContent = val.toLocaleString('ko-KR');
+  document.getElementById('ob-slider').value = val;
+}
+
+function syncSlider(val) {
+  val = parseInt(val);
+  obGoal = val;
+  document.getElementById('ob-goal-num').textContent = val.toLocaleString('ko-KR');
+  // sync preset selection
+  document.querySelectorAll('.ob-preset').forEach(e => {
+    e.classList.toggle('selected', parseInt(e.dataset.val) === val);
+  });
+}
+
+function toggleTheme(el) {
+  const t = el.dataset.theme;
+  if (obThemes.has(t)) {
+    obThemes.delete(t);
+    el.classList.remove('selected');
+  } else {
+    obThemes.add(t);
+    el.classList.add('selected');
+  }
+}
+
+function obNext() {
+  if (obStep < 2) {
+    obStep++;
+    document.getElementById('ob-slides').style.transform = `translateX(-${obStep * 100}%)`;
+    document.querySelectorAll('.ob-dot').forEach((d, i) => d.classList.toggle('active', i === obStep));
+    if (obStep === 1) {
+      document.getElementById('ob-cta-label').textContent = '다음';
+      document.getElementById('ob-skip').style.display = 'block';
+    } else {
+      document.getElementById('ob-cta-label').textContent = '완료';
+      document.getElementById('ob-skip').style.display = 'none';
+    }
+  } else {
+    finishOnboarding();
+  }
+}
+
+function finishOnboarding() {
+  // Apply goal
+  state.dailyGoal = obGoal;
+
+  // Apply preferred filter
+  if (obThemes.size > 0) {
+    const first = [...obThemes][0];
+    if (FILTERS.includes(first)) activeFilter = first;
+  }
+
+  const el = document.getElementById('onboarding');
+  el.classList.add('hidden');
+  setTimeout(() => { el.style.display = 'none'; }, 420);
+
+  // Re-render with updated data
+  updateGoals();
+  renderFilters();
+  renderCourses();
+}
+
+/* ═══════════════════════════════
+   COURSE DATA
+═══════════════════════════════ */
+const COURSES = [
+  // ── 직장 근처 ──
+  {
+    id: 'cheonggyecheon',
+    name: '청계천 점심 코스',
+    area: '종로 · 을지로',
+    distance: 2.2,
+    duration: 28,
+    difficulty: 1,
+    tags: ['점심시간', '물길', '도심'],
+    tagTypes: ['amber', 'blue', 'green'],
+    filter: '직장 근처',
+    description: '점심시간 30분, 도심 한복판에서 물소리 들으며 걷기',
+    routeShape: 'stream',
+  },
+  {
+    id: 'gwanghwamun',
+    name: '광화문 광장 루프',
+    area: '광화문 · 경복궁',
+    distance: 1.8,
+    duration: 22,
+    difficulty: 1,
+    tags: ['점심시간', '광장', '역사'],
+    tagTypes: ['amber', 'green', 'amber'],
+    filter: '직장 근처',
+    description: '경복궁 담장을 따라 한 바퀴, 빠르고 가볍게',
+    routeShape: 'loop',
+  },
+  // ── 집 근처 ──
+  {
+    id: 'neighborhood',
+    name: '저녁 동네 한 바퀴',
+    area: '성수 · 뚝섬',
+    distance: 2.6,
+    duration: 33,
+    difficulty: 1,
+    tags: ['저녁', '동네', '가볍게'],
+    tagTypes: ['amber', 'green', 'green'],
+    filter: '집 근처',
+    description: '퇴근 후 집 주변을 느릿하게 한 바퀴, 머리를 식히는 시간',
+    routeShape: 'park',
+  },
+  {
+    id: 'morning',
+    name: '아침 모닝 워크',
+    area: '마포 · 합정',
+    distance: 3.1,
+    duration: 40,
+    difficulty: 1,
+    tags: ['아침', '동네', '카페'],
+    tagTypes: ['amber', 'green', 'blue'],
+    filter: '집 근처',
+    description: '동네 카페에서 마무리하는 상쾌한 아침 코스',
+    routeShape: 'river',
+  },
+  // ── 강·하천 ──
+  {
+    id: 'hangang',
+    name: '한강 둔치 코스',
+    area: '여의도 · 마포',
+    distance: 5.4,
+    duration: 65,
+    difficulty: 1,
+    tags: ['강변', '야경', '자전거도로'],
+    tagTypes: ['blue', 'amber', 'green'],
+    filter: '강·하천',
+    description: '탁 트인 한강변, 바람 맞으며 기분 좋게 멀리 걷기',
+    routeShape: 'stream',
+  },
+  {
+    id: 'anyangcheon',
+    name: '안양천 생태길',
+    area: '영등포 · 구로',
+    distance: 4.8,
+    duration: 58,
+    difficulty: 1,
+    tags: ['하천', '생태', '벚꽃'],
+    tagTypes: ['blue', 'green', 'amber'],
+    filter: '강·하천',
+    description: '도심 속 하천 생태길, 철새와 갈대밭을 지나며',
+    routeShape: 'river',
+  },
+  // ── 공원 ──
+  {
+    id: 'olympic',
+    name: '올림픽공원 산책',
+    area: '송파',
+    distance: 2.9,
+    duration: 38,
+    difficulty: 1,
+    tags: ['공원', '잔디밭', '조각'],
+    tagTypes: ['green', 'green', 'amber'],
+    filter: '공원',
+    description: '넓은 잔디밭과 조각공원을 가로지르는 여유로운 코스',
+    routeShape: 'park',
+  },
+  {
+    id: 'namsan',
+    name: '남산 순환로',
+    area: '중구 · 용산',
+    distance: 3.8,
+    duration: 55,
+    difficulty: 2,
+    tags: ['공원', '뷰포인트', '순환'],
+    tagTypes: ['green', 'blue', 'green'],
+    filter: '공원',
+    description: '남산타워를 돌아보며 서울 시내를 내려다보는 코스',
+    routeShape: 'loop',
+  },
+  // ── 공원 ──
+  {
+    id: 'seoripool',
+    name: '서리풀공원 숲길',
+    area: '서초구 · 방배동',
+    distance: 3.2,
+    duration: 45,
+    difficulty: 2,
+    tags: ['숲길', '벚꽃', '도심속자연'],
+    tagTypes: ['green', 'amber', 'green'],
+    filter: '공원',
+    description: '예술의전당 옆 서초구 대표 숲길. 울창한 나무 사이로 걷는 도심 속 힐링 코스. 봄엔 벚꽃, 가을엔 단풍이 아름다워요.',
+    routeShape: 'geo',
+    geoData: {
+      bbox: { minLat: 37.4940, maxLat: 37.5045, minLon: 126.9990, maxLon: 127.0140 },
+      park: [
+        [37.5031,127.0067],[37.5030,127.0063],[37.5023,127.0065],[37.5022,127.0062],
+        [37.5016,127.0064],[37.5009,127.0067],[37.5001,127.0070],[37.5000,127.0067],
+        [37.4997,127.0067],[37.4996,127.0064],[37.4996,127.0059],[37.4988,127.0060],
+        [37.4987,127.0061],[37.4983,127.0062],[37.4978,127.0063],[37.4977,127.0062],
+        [37.4976,127.0057],[37.4976,127.0054],[37.4979,127.0053],[37.4981,127.0049],
+        [37.4970,127.0054],[37.4961,127.0059],[37.4956,127.0076],[37.4955,127.0077],
+        [37.4958,127.0087],[37.4958,127.0089],[37.4952,127.0091],[37.4954,127.0095],
+        [37.4953,127.0100],[37.4958,127.0100],[37.4959,127.0097],[37.4964,127.0097],
+        [37.4963,127.0103],[37.4964,127.0104],[37.4967,127.0104],[37.4967,127.0106],
+        [37.4969,127.0106],[37.4970,127.0107],[37.4975,127.0105],[37.4976,127.0102],
+        [37.4978,127.0104],[37.4980,127.0106],[37.4982,127.0103],[37.4979,127.0095],
+        [37.4981,127.0090],[37.4985,127.0090],[37.4985,127.0087],[37.4995,127.0087],
+        [37.5000,127.0083],[37.5001,127.0081],[37.5004,127.0078],[37.5008,127.0076],
+        [37.5013,127.0075],[37.5011,127.0072],[37.5016,127.0070],[37.5019,127.0073],
+        [37.5020,127.0073],[37.5020,127.0071],[37.5024,127.0071],[37.5029,127.0068],
+        [37.5030,127.0069],[37.5031,127.0067],
+      ],
+      trail: [
+        [37.4960,127.0062],[37.4964,127.0068],[37.4968,127.0075],
+        [37.4972,127.0082],[37.4978,127.0088],[37.4984,127.0090],
+        [37.4991,127.0086],[37.4997,127.0080],[37.5004,127.0076],
+        [37.5011,127.0072],[37.5018,127.0069],[37.5025,127.0067],
+      ],
+      roads: [
+        { type: 'primary', pts: [[37.4870,127.0101],[37.4875,127.0098],[37.4885,127.0093],[37.4893,127.0089],[37.4901,127.0086],[37.4909,127.0081],[37.4914,127.0079],[37.4917,127.0078],[37.4919,127.0077]] },
+        { type: 'secondary', pts: [[37.4919,127.0077],[37.4920,127.0082],[37.4921,127.0084],[37.4925,127.0097],[37.4929,127.0111],[37.4933,127.0125],[37.4936,127.0133],[37.4937,127.0137]] },
+        { type: 'footway', pts: [[37.4966,127.0048],[37.4969,127.0057]] },
+      ],
+    },
+  },
+  // ── 산·숲 ──
+  {
+    id: 'bukak',
+    name: '북악산 둘레길',
+    area: '종로 · 성북',
+    distance: 4.1,
+    duration: 75,
+    difficulty: 3,
+    tags: ['숲길', '성곽', '뷰포인트'],
+    tagTypes: ['green', 'amber', 'blue'],
+    filter: '산·숲',
+    description: '서울 성곽을 따라 걷는 역사적인 숲길 트레일',
+    routeShape: 'mountain',
+  },
+  {
+    id: 'bukhansan',
+    name: '북한산 진달래 능선',
+    area: '은평 · 강북',
+    distance: 6.8,
+    duration: 120,
+    difficulty: 3,
+    tags: ['등산', '능선', '서울 전망'],
+    tagTypes: ['amber', 'green', 'blue'],
+    filter: '산·숲',
+    description: '북한산 능선을 타며 서울 전경을 내려다보는 도전적인 코스',
+    routeShape: 'ridge',
+  },
+];
+
+const FILTERS = ['전체', '직장 근처', '집 근처', '강·하천', '공원', '산·숲'];
+
+let activeFilter = '전체';
+let activeCourse = null;
+
+/* ═══════════════════════════════
+   STATE
+═══════════════════════════════ */
+const state = {
+  tab: 'record',
+  isWalking: false,
+  startMs: null,
+  elapsed: 0,
+  steps: 0,
+  distance: 0,
+  route: [],
+  geoRoute: [],
+  animFrame: null,
+  routeInterval: null,
+  history: [
+    {
+      id: 1,
+      dateLabel: '오늘 오전',
+      timeLabel: '06:32',
+      duration: 1680,
+      steps: 3124,
+      distance: 2.3,
+      route: makeDemoRoute(195, 230, 70, 80, 40)
+    },
+    {
+      id: 2,
+      dateLabel: '어제',
+      timeLabel: '07:14',
+      duration: 3060,
+      steps: 5847,
+      distance: 4.1,
+      route: makeDemoRoute(180, 210, 90, 110, 55)
+    },
+    {
+      id: 3,
+      dateLabel: '6월 27일',
+      timeLabel: '18:45',
+      duration: 1320,
+      steps: 2456,
+      distance: 1.8,
+      route: makeDemoRoute(200, 250, 55, 65, 30)
+    }
+  ],
+  dailySteps: 3124,
+  dailyGoal: 6000,
+  weeklySteps: 18651,
+  weeklyGoal: 30000,
+};
+
+function makeDemoRoute(cx, cy, rx, ry, pts) {
+  const result = [];
+  const totalPts = pts * 4;
+  for (let i = 0; i <= totalPts; i++) {
+    const t = (i / totalPts) * Math.PI * 2;
+    const jx = (Math.random() - 0.5) * 10;
+    const jy = (Math.random() - 0.5) * 10;
+    result.push({ x: cx + Math.cos(t) * rx + jx, y: cy + Math.sin(t) * ry + jy });
+  }
+  return result;
+}
+
+/* ═══════════════════════════════
+   MAP CANVAS
+═══════════════════════════════ */
+const mapCanvas = document.getElementById('map-canvas');
+const mapCtx = mapCanvas.getContext('2d');
+let mapW, mapH, dpr;
+
+function initCanvas() {
+  dpr = window.devicePixelRatio || 1;
+  const rect = mapCanvas.parentElement.getBoundingClientRect();
+  mapW = rect.width;
+  mapH = rect.height;
+  mapCanvas.width = mapW * dpr;
+  mapCanvas.height = mapH * dpr;
+  mapCtx.scale(dpr, dpr);
+  drawMap();
+}
+
+function drawMapBg(ctx, W, H) {
+  ctx.fillStyle = '#E2E4E2';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = '#D4D7D4';
+  const blockRects = [
+    [0, 0, W*0.26, H*0.32], [W*0.32, 0, W*0.28, H*0.32], [W*0.68, 0, W*0.32, H*0.32],
+    [0, H*0.38, W*0.26, H*0.28], [W*0.32, H*0.38, W*0.28, H*0.28], [W*0.68, H*0.38, W*0.32, H*0.28],
+    [0, H*0.72, W*0.44, H*0.28], [W*0.54, H*0.72, W*0.46, H*0.28],
+  ];
+  blockRects.forEach(([x,y,w,h]) => ctx.fillRect(x, y, w, h));
+
+  const parkGrad = ctx.createLinearGradient(W*0.32, H*0.38, W*0.6, H*0.66);
+  parkGrad.addColorStop(0, '#C8CEC8');
+  parkGrad.addColorStop(1, '#BCC4BC');
+  ctx.fillStyle = parkGrad;
+  ctx.fillRect(W*0.32, H*0.38, W*0.28, H*0.28);
+
+  ctx.fillStyle = '#ADBCAD';
+  [[W*0.39,H*0.44],[W*0.46,H*0.48],[W*0.42,H*0.55],[W*0.52,H*0.44],[W*0.55,H*0.52],[W*0.49,H*0.58]].forEach(([tx,ty]) => {
+    ctx.beginPath(); ctx.arc(tx, ty, 8, 0, Math.PI*2); ctx.fill();
+  });
+
+  ctx.fillStyle = '#F0F2F0';
+  [H*0.32, H*0.66].forEach(ry => ctx.fillRect(0, ry, W, H*0.06));
+  [W*0.26, W*0.60].forEach(rx => ctx.fillRect(rx, 0, W*0.06, H));
+
+  ctx.save();
+  ctx.setLineDash([12, 10]);
+  ctx.strokeStyle = '#E0E3E0';
+  ctx.lineWidth = 1;
+  [H*0.32+H*0.03, H*0.66+H*0.03].forEach(ry => { ctx.beginPath(); ctx.moveTo(0,ry); ctx.lineTo(W,ry); ctx.stroke(); });
+  [W*0.26+W*0.03, W*0.60+W*0.03].forEach(rx => { ctx.beginPath(); ctx.moveTo(rx,0); ctx.lineTo(rx,H); ctx.stroke(); });
+  ctx.restore();
+}
+
+function drawRouteOnCtx(ctx, route, color, lineWidth, dotRadius) {
+  if (!route || route.length < 2) return;
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.moveTo(route[0].x, route[0].y);
+  for (let i = 1; i < route.length; i++) ctx.lineTo(route[i].x, route[i].y);
+  ctx.stroke();
+
+  if (dotRadius > 0) {
+    ctx.beginPath();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.arc(route[0].x, route[0].y, dotRadius*0.7, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    const last = route[route.length - 1];
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.arc(last.x, last.y, dotRadius, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  }
+}
+
+/* Draw a ghost guide route for active course */
+function makeCourseGuideRoute(shape, W, H) {
+  const pts = [];
+  if (shape === 'river') {
+    // Long horizontal wavy path
+    for (let i = 0; i <= 60; i++) {
+      const t = i / 60;
+      pts.push({ x: W*0.05 + t*(W*0.9), y: H*0.45 + Math.sin(t*Math.PI*3)*H*0.08 });
+    }
+  } else if (shape === 'mountain') {
+    // Diagonal up-and-back
+    for (let i = 0; i <= 60; i++) {
+      const t = i / 60;
+      if (t < 0.5) {
+        pts.push({ x: W*0.2 + t*2*W*0.5, y: H*0.75 - t*2*H*0.5 + Math.sin(t*15)*H*0.04 });
+      } else {
+        const s = (t-0.5)*2;
+        pts.push({ x: W*0.7 + s*W*0.1, y: H*0.25 + s*H*0.4 + Math.sin(s*12)*H*0.03 });
+      }
+    }
+  } else if (shape === 'loop') {
+    // Ellipse loop
+    for (let i = 0; i <= 60; i++) {
+      const a = (i/60)*Math.PI*2;
+      pts.push({ x: W*0.5 + Math.cos(a)*W*0.35, y: H*0.45 + Math.sin(a)*H*0.3 });
+    }
+  } else if (shape === 'park') {
+    // Gentle rounded rectangle
+    const pad = W*0.15;
+    for (let i = 0; i <= 60; i++) {
+      const a = (i/60)*Math.PI*2;
+      pts.push({ x: W*0.5 + Math.cos(a)*(W*0.32) + Math.sin(a*2)*W*0.05, y: H*0.45 + Math.sin(a)*(H*0.28) });
+    }
+  } else if (shape === 'stream') {
+    // Slow S-curve
+    for (let i = 0; i <= 60; i++) {
+      const t = i/60;
+      pts.push({ x: W*0.08 + t*W*0.84, y: H*0.5 + Math.sin(t*Math.PI*2)*H*0.18 + Math.sin(t*Math.PI*5)*H*0.03 });
+    }
+  } else if (shape === 'ridge') {
+    // Zigzag ascending
+    for (let i = 0; i <= 60; i++) {
+      const t = i/60;
+      const wave = Math.sin(t*Math.PI*6)*W*0.12;
+      pts.push({ x: W*0.5 + wave, y: H*0.85 - t*H*0.65 });
+    }
+  }
+  return pts;
+}
+
+function makeGeoGuideRoute(geoData, W, H) {
+  if (!geoData || !geoData.trail || geoData.trail.length < 2) return [];
+  return geoToCanvasRoute(geoData.trail, geoData.bbox, W, H);
+}
+
+function drawMap() {
+  mapCtx.clearRect(0, 0, mapW, mapH);
+  drawMapBg(mapCtx, mapW, mapH);
+
+  // Draw ghost course guide if active course set
+  if (activeCourse) {
+    let guide;
+    if (activeCourse._savedRoute) {
+      const r = activeCourse._savedRoute;
+      let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+      r.forEach(p=>{minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);});
+      const rw=maxX-minX||1, rh=maxY-minY||1;
+      const sc=Math.min((mapW*0.7)/rw,(mapH*0.6)/rh);
+      const ox=(mapW-rw*sc)/2, oy=mapH*0.2;
+      guide = r.map(p=>({x:ox+(p.x-minX)*sc, y:oy+(p.y-minY)*sc}));
+    } else {
+      if (activeCourse.routeShape === 'geo' && activeCourse.geoData) {
+        guide = makeGeoGuideRoute(activeCourse.geoData, mapW, mapH);
+      } else {
+        guide = makeCourseGuideRoute(activeCourse.routeShape, mapW, mapH);
+      }
+    }
+    mapCtx.save();
+    mapCtx.setLineDash([8, 8]);
+    mapCtx.globalAlpha = 0.35;
+    drawRouteOnCtx(mapCtx, guide, '#1A1C20', 4, 0);
+    mapCtx.setLineDash([]);
+    mapCtx.globalAlpha = 1;
+    if (guide.length > 0) {
+      const sp = guide[0];
+      mapCtx.beginPath();
+      mapCtx.fillStyle = '#1A1C20';
+      mapCtx.arc(sp.x, sp.y, 7, 0, Math.PI*2);
+      mapCtx.fill();
+      mapCtx.fillStyle = 'white';
+      mapCtx.beginPath();
+      mapCtx.arc(sp.x, sp.y, 3.5, 0, Math.PI*2);
+      mapCtx.fill();
+    }
+    mapCtx.restore();
+  }
+
+  if (state.route.length >= 2) {
+    drawRouteOnCtx(mapCtx, state.route, 'rgba(26,28,32,0.1)', 10, 0);
+    drawRouteOnCtx(mapCtx, state.route, '#1A1C20', 4, 7);
+  }
+}
+
+/* ═══════════════════════════════
+   COURSE MAP PREVIEW CANVAS
+═══════════════════════════════ */
+function drawCoursePreview(canvas, shape, courseObj) {
+  const d2 = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || 362;
+  const H = 130;
+  canvas.width = W * d2;
+  canvas.height = H * d2;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(d2, d2);
+
+  // Geo shape: use real map renderer
+  if (shape === 'geo' && courseObj && courseObj.geoData) {
+    drawGeoMap(ctx, W, H, courseObj.geoData);
+    return;
+  }
+
+  // Simplified bg
+  ctx.fillStyle = '#E0E2E0';
+  ctx.fillRect(0, 0, W, H);
+
+  // City blocks
+  ctx.fillStyle = '#D2D5D2';
+  [[0,0,W*0.22,H*0.38],[W*0.28,0,W*0.24,H*0.38],[W*0.58,0,W*0.42,H*0.38],
+   [0,H*0.5,W*0.22,H*0.5],[W*0.28,H*0.5,W*0.24,H*0.5],[W*0.58,H*0.5,W*0.42,H*0.5]].forEach(([x,y,w,h]) => ctx.fillRect(x,y,w,h));
+
+  // Park
+  ctx.fillStyle = '#BFCBBF';
+  ctx.fillRect(W*0.3, H*0.42, W*0.22, H*0.5);
+
+  // Roads
+  ctx.fillStyle = '#EEF0EE';
+  [H*0.38, H*0.48].forEach(ry => ctx.fillRect(0, ry, W, H*0.08));
+  [W*0.22, W*0.52].forEach(rx => ctx.fillRect(rx, 0, W*0.06, H));
+
+  // Route
+  const pts = makeCourseGuideRoute(shape, W, H);
+  if (pts.length > 1) {
+    // Shadow
+    ctx.save();
+    ctx.strokeStyle = 'rgba(26,28,32,0.12)';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+    ctx.restore();
+
+    // Main
+    ctx.strokeStyle = '#1A1C20';
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+
+    // Start dot
+    ctx.fillStyle = '#1A1C20';
+    ctx.beginPath();
+    ctx.arc(pts[0].x, pts[0].y, 5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(pts[0].x, pts[0].y, 2.5, 0, Math.PI*2);
+    ctx.fill();
+
+    // End dot
+    const ep = pts[pts.length-1];
+    ctx.fillStyle = '#C8782A';
+    ctx.beginPath();
+    ctx.arc(ep.x, ep.y, 5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(ep.x, ep.y, 2.5, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+/* ═══════════════════════════════
+   GEO PROJECTION RENDERER
+═══════════════════════════════ */
+function geoProject(lat, lon, bbox, W, H, pad) {
+  pad = pad || 0;
+  const x = pad + (lon - bbox.minLon) / (bbox.maxLon - bbox.minLon) * (W - pad * 2);
+  const y = pad + (bbox.maxLat - lat) / (bbox.maxLat - bbox.minLat) * (H - pad * 2);
+  return { x, y };
+}
+
+function drawGeoMap(ctx, W, H, geoData) {
+  const { bbox, park, trail } = geoData;
+  // Add generous padding so shape doesn't clip
+  const PAD = Math.min(W, H) * 0.10;
+  const proj = (lat, lon) => geoProject(lat, lon, bbox, W, H, PAD);
+
+  // ── Background ──
+  ctx.fillStyle = '#EEF0EB';
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle grid lines (street texture)
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+  ctx.lineWidth = 1;
+  for (let i = 1; i < 5; i++) {
+    ctx.beginPath(); ctx.moveTo(W*i/5, 0); ctx.lineTo(W*i/5, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, H*i/5); ctx.lineTo(W, H*i/5); ctx.stroke();
+  }
+
+  // ── Park soft glow (outer shadow) ──
+  if (park && park.length > 2) {
+    const pts = park.map(([lat, lon]) => proj(lat, lon));
+
+    // Glow
+    ctx.save();
+    ctx.shadowColor = 'rgba(100,150,80,0.3)';
+    ctx.shadowBlur = W * 0.06;
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.fillStyle = '#B8CDB0';
+    ctx.fill();
+    ctx.restore();
+
+    // Park fill (no shadow)
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.fillStyle = '#C8D9BF';
+    ctx.fill();
+
+    // Park border - thin dashed
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.strokeStyle = '#8FA882';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Interior tree canopy dots (inset from boundary center)
+    const cx = pts.reduce((s, p) => s + p.x, 0) / pts.length;
+    const cy = pts.reduce((s, p) => s + p.y, 0) / pts.length;
+    const r = W * 0.012;
+    ctx.fillStyle = 'rgba(90,130,70,0.25)';
+    park.filter((_, i) => i % 4 === 0).forEach(([lat, lon]) => {
+      const p = proj(lat, lon);
+      // Move point slightly toward center to keep dots inside
+      const px = p.x * 0.3 + cx * 0.7;
+      const py = p.y * 0.3 + cy * 0.7;
+      ctx.beginPath();
+      ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  // ── Trail route ──
+  if (trail && trail.length > 1) {
+    const pts = trail.map(([lat, lon]) => proj(lat, lon));
+    const lw = Math.max(2, W * 0.007);
+
+    // White outline for contrast
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.setLineDash([]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+    ctx.lineWidth = lw + 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Trail line
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = '#2A4A24';
+    ctx.lineWidth = lw;
+    ctx.stroke();
+
+    // Start marker
+    const sp = pts[0];
+    const mr = Math.max(4, W * 0.014);
+    ctx.beginPath();
+    ctx.fillStyle = '#1A1C20';
+    ctx.arc(sp.x, sp.y, mr, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.fillStyle = 'white';
+    ctx.arc(sp.x, sp.y, mr * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // End marker
+    const ep = pts[pts.length - 1];
+    ctx.beginPath();
+    ctx.fillStyle = '#D4860E';
+    ctx.arc(ep.x, ep.y, mr, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.fillStyle = 'white';
+    ctx.arc(ep.x, ep.y, mr * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function geoToCanvasRoute(trail, bbox, W, H) {
+  const PAD = W * 0.1;
+  return trail.map(([lat, lon]) => geoProject(lat, lon, bbox, W, H, PAD));
+}
+
+/* ── Thumbnail canvas ── */
+function drawThumb(canvas, route) {
+  const ctx = canvas.getContext('2d');
+  const dpr2 = window.devicePixelRatio || 1;
+  canvas.width = 62 * dpr2;
+  canvas.height = 62 * dpr2;
+  ctx.scale(dpr2, dpr2);
+  ctx.fillStyle = '#DCDFE0'; ctx.fillRect(0, 0, 62, 62);
+  ctx.fillStyle = '#ECEEF0';
+  ctx.fillRect(0, 20, 62, 10); ctx.fillRect(0, 42, 62, 10);
+  ctx.fillRect(18, 0, 10, 62); ctx.fillRect(40, 0, 10, 62);
+
+  if (!route || route.length < 2) return;
+
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  route.forEach(p => { minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y); });
+  const rw=maxX-minX||1, rh=maxY-minY||1;
+  const scale=Math.min(44/rw,44/rh);
+  const ox=(62-rw*scale)/2, oy=(62-rh*scale)/2;
+  const scaled=route.map(p=>({x:ox+(p.x-minX)*scale,y:oy+(p.y-minY)*scale}));
+
+  ctx.beginPath(); ctx.strokeStyle='#3E9158'; ctx.lineWidth=2;
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.moveTo(scaled[0].x,scaled[0].y);
+  scaled.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.stroke();
+  ctx.beginPath(); ctx.fillStyle='#2B6540';
+  ctx.arc(scaled[0].x,scaled[0].y,3,0,Math.PI*2); ctx.fill();
+}
+
+/* ═══════════════════════════════
+   TIMER
+═══════════════════════════════ */
+function formatTime(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = Math.floor(totalSeconds % 60);
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function tick() {
+  if (!state.isWalking) return;
+  const elapsed = (Date.now() - state.startMs + state.elapsed) / 1000;
+  document.getElementById('timer-display').textContent = formatTime(elapsed);
+  state.steps = Math.floor(elapsed * 2.1);
+  state.distance = elapsed * 0.0013;
+  document.getElementById('steps-display').textContent = state.steps.toLocaleString('ko-KR');
+  document.getElementById('dist-display').textContent = state.distance.toFixed(2);
+  state.animFrame = requestAnimationFrame(tick);
+}
+
+/* ═══════════════════════════════
+   ROUTE SIMULATION
+═══════════════════════════════ */
+function startRouteSimulation() {
+  const startX = mapW * 0.44;
+  const startY = mapH * 0.80;
+  if (state.route.length === 0) state.route.push({x: startX, y: startY});
+
+  let angle = -Math.PI / 2;
+  const speed = 3;
+
+  state.routeInterval = setInterval(() => {
+    if (!state.isWalking) return;
+    const last = state.route[state.route.length - 1];
+    const target = getCircuitAngle(last, mapW, mapH);
+    const diff = target - angle;
+    const normDiff = ((diff + Math.PI) % (Math.PI * 2)) - Math.PI;
+    angle += normDiff * 0.12 + (Math.random() - 0.5) * 0.15;
+
+    const newX = last.x + Math.cos(angle) * speed;
+    const newY = last.y + Math.sin(angle) * speed;
+    state.route.push({
+      x: Math.max(20, Math.min(mapW-20, newX)),
+      y: Math.max(20, Math.min(mapH-20, newY))
+    });
+    drawMap();
+  }, 400);
+}
+
+function getCircuitAngle(pos, W, H) {
+  const cx = W * 0.48, cy = H * 0.50;
+  const dx = cx - pos.x, dy = cy - pos.y;
+  return Math.atan2(dx, -dy);
+}
+
+function stopRouteSimulation() {
+  clearInterval(state.routeInterval);
+  state.routeInterval = null;
+}
+
+/* ═══════════════════════════════
+   WALK CONTROL
+═══════════════════════════════ */
+function toggleWalk() {
+  state.isWalking ? stopWalk() : startWalk();
+}
+
+function startWalk() {
+  state.isWalking = true;
+  state.startMs = Date.now();
+  state.steps = 0; state.distance = 0; state.route = [];
+  pedo.sessionSteps = 0;
+
+  const btn = document.getElementById('btn-rec');
+  btn.classList.add('walking');
+  document.getElementById('icon-play').style.display = 'none';
+  document.getElementById('icon-stop').style.display = 'block';
+  document.getElementById('rec-badge').classList.add('visible');
+
+  tick();
+  startRouteSimulation();
+}
+
+function stopWalk() {
+  const elapsed = (Date.now() - state.startMs + state.elapsed) / 1000;
+  state.isWalking = false;
+  cancelAnimationFrame(state.animFrame);
+  stopRouteSimulation();
+
+  const btn = document.getElementById('btn-rec');
+  btn.classList.remove('walking');
+  document.getElementById('icon-play').style.display = 'block';
+  document.getElementById('icon-stop').style.display = 'none';
+  document.getElementById('rec-badge').classList.remove('visible');
+
+  // Sync pedo total if sensor is not active (simulation)
+  if (!pedo.sensorActive) {
+    pedo.totalSteps += state.steps;
+    updatePedoUI();
+  }
+
+  if (elapsed > 10 && state.route.length > 2) {
+    const now = new Date();
+    const entry = {
+      id: Date.now(),
+      dateLabel: '방금 전',
+      timeLabel: `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`,
+      duration: Math.round(elapsed),
+      steps: state.steps,
+      distance: parseFloat(state.distance.toFixed(2)),
+      route: [...state.route]
+    };
+    state.history.unshift(entry);
+    state.dailySteps += state.steps;
+    renderHistory();
+    updateGoals();
+    // Ask to save as personal archive
+    setTimeout(() => openSaveSheet(entry), 500);
+  }
+
+  document.getElementById('timer-display').textContent = '00:00';
+  document.getElementById('steps-display').textContent = '0';
+  document.getElementById('dist-display').textContent = '0.00';
+  state.elapsed = 0; state.route = []; state.steps = 0; state.distance = 0;
+  drawMap();
+}
+
+document.getElementById('btn-rec').addEventListener('click', toggleWalk);
+
+/* ═══════════════════════════════
+   ARCHIVE — SAVE ROUTE
+═══════════════════════════════ */
+let myArchives = [];
+let pendingEntry = null;   // history entry waiting to be named & saved
+
+function openSaveSheet(histEntry) {
+  pendingEntry = histEntry;
+
+  // Populate preview
+  document.getElementById('save-preview-dist').textContent =
+    `${histEntry.distance.toFixed(1)} km`;
+  document.getElementById('save-preview-meta').textContent =
+    `${formatTime(histEntry.duration)} · ${histEntry.steps.toLocaleString('ko-KR')}걸음`;
+
+  // Draw thumbnail
+  requestAnimationFrame(() => {
+    const c = document.getElementById('save-thumb-canvas');
+    if (c) drawThumb(c, histEntry.route);
+  });
+
+  // Suggest a name based on time-of-day
+  const h = new Date().getHours();
+  const suggestion = h < 10 ? '아침 산책' : h < 13 ? '점심 산책' : h < 17 ? '오후 산책' : h < 20 ? '저녁 산책' : '밤 산책';
+  const input = document.getElementById('save-name-input');
+  input.value = '';
+  input.placeholder = `코스 이름 (예: ${suggestion})`;
+
+  const sheet = document.getElementById('save-sheet');
+  sheet.style.pointerEvents = 'all';
+  sheet.classList.add('open');
+  setTimeout(() => input.focus(), 400);
+}
+
+function closeSaveSheet() {
+  const sheet = document.getElementById('save-sheet');
+  sheet.classList.remove('open');
+  setTimeout(() => { sheet.style.pointerEvents = 'none'; }, 380);
+  pendingEntry = null;
+}
+
+function confirmSaveRoute() {
+  if (!pendingEntry) return;
+  const input = document.getElementById('save-name-input');
+  const name = input.value.trim() || input.placeholder.replace('코스 이름 (예: ', '').replace(')', '');
+
+  const archive = {
+    id: Date.now(),
+    name,
+    distance: pendingEntry.distance,
+    duration: pendingEntry.duration,
+    steps: pendingEntry.steps,
+    route: pendingEntry.route,
+    dateLabel: pendingEntry.dateLabel,
+    savedAt: new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }),
+  };
+
+  myArchives.unshift(archive);
+  renderMyCourses();
+  closeSaveSheet();
+
+  // Brief toast feedback
+  showToast(`"${name}" 저장됐어요`);
+}
+
+function deleteArchive(id) {
+  myArchives = myArchives.filter(a => a.id !== id);
+  renderMyCourses();
+}
+
+function startArchiveCourse(archive) {
+  // Treat the saved route as an active course guide
+  activeCourse = {
+    name: archive.name,
+    distance: archive.distance,
+    duration: archive.duration,
+    routeShape: null,
+    _savedRoute: archive.route,
+  };
+  document.getElementById('banner-name').textContent = archive.name;
+  document.getElementById('banner-meta').textContent =
+    `${archive.distance}km · 약 ${archive.duration}분`;
+  document.getElementById('course-banner').classList.add('visible');
+  drawMap();
+  switchTab('record');
+}
+
+function renderMyCourses() {
+  const section = document.getElementById('my-courses-section');
+  const list = document.getElementById('my-courses-list');
+  const countEl = document.getElementById('my-courses-count');
+
+  if (myArchives.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  countEl.textContent = myArchives.length;
+
+  list.innerHTML = '';
+  myArchives.forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'my-course-card';
+    card.innerHTML = `
+      <div class="my-course-thumb"><canvas id="arch-${a.id}" width="56" height="56"></canvas></div>
+      <div class="my-course-info">
+        <div class="my-course-name">${a.name}</div>
+        <div class="my-course-meta">${a.distance}km · ${formatTime(a.duration)} · ${a.savedAt}</div>
+      </div>
+      <div class="my-course-actions">
+        <button class="my-course-start" onclick="event.stopPropagation();startArchiveCourse(myArchives.find(x=>x.id===${a.id}))">시작</button>
+        <button class="my-course-del" onclick="event.stopPropagation();deleteArchive(${a.id})" aria-label="삭제">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+        </button>
+      </div>
+    `;
+    list.appendChild(card);
+    requestAnimationFrame(() => {
+      const c = document.getElementById(`arch-${a.id}`);
+      if (c) drawThumb(c, a.route);
+    });
+  });
+}
+
+/* 토스트 */
+function showToast(msg) {
+  let t = document.getElementById('app-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'app-toast';
+    t.style.cssText = `
+      position:absolute;bottom:96px;left:50%;transform:translateX(-50%) translateY(8px);
+      background:var(--ink);color:white;font-size:13px;font-weight:600;
+      padding:10px 18px;border-radius:99px;white-space:nowrap;
+      opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:200;
+      pointer-events:none;
+    `;
+    document.getElementById('app').appendChild(t);
+  }
+  t.textContent = msg;
+  requestAnimationFrame(() => {
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(8px)';
+  }, 2400);
+}
+
+/* ═══════════════════════════════
+   COURSE SHEET
+═══════════════════════════════ */
+let sheetCourse = null;
+
+function selectCourse(course) {
+  sheetCourse = course;
+
+  // Populate text
+  document.getElementById('sheet-area').textContent = course.area;
+  document.getElementById('sheet-name').textContent = course.name;
+  document.getElementById('sheet-desc').textContent = course.description;
+  document.getElementById('sheet-dist').textContent = course.distance;
+  document.getElementById('sheet-dur').textContent = course.duration;
+
+  // Difficulty dots
+  const diffLabels = ['', '쉬움', '보통', '어려움'];
+  document.getElementById('sheet-diff-dots').innerHTML =
+    [1,2,3].map(i => `<div class="sheet-diff-dot ${i <= course.difficulty ? 'on' : ''}"></div>`).join('');
+  document.getElementById('sheet-diff-label').textContent = diffLabels[course.difficulty];
+
+  // Tags
+  document.getElementById('sheet-tags').innerHTML =
+    course.tags.map((t, i) => `<span class="course-tag ${course.tagTypes[i]}">${t}</span>`).join('');
+
+  // Open sheet first so canvas has layout dimensions
+  const sheet = document.getElementById('course-sheet');
+  sheet.style.pointerEvents = 'all';
+  sheet.classList.add('open');
+
+  // Draw map after two rAF cycles so CSS transition has applied and offsetWidth is real
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const canvas = document.getElementById('sheet-map-canvas');
+    if (canvas) drawCoursePreview(canvas, course.routeShape, course);
+  }));
+}
+
+function closeCourseSheet() {
+  const sheet = document.getElementById('course-sheet');
+  sheet.classList.remove('open');
+  setTimeout(() => { sheet.style.pointerEvents = 'none'; }, 380);
+}
+
+function startCourseFromSheet() {
+  if (!sheetCourse) return;
+  activeCourse = sheetCourse;
+  document.getElementById('banner-name').textContent = sheetCourse.name;
+  document.getElementById('banner-meta').textContent = `${sheetCourse.distance}km · 약 ${sheetCourse.duration}분`;
+  document.getElementById('course-banner').classList.add('visible');
+  drawMap();
+  closeCourseSheet();
+  switchTab('record');
+}
+
+function clearActiveCourse() {
+  activeCourse = null;
+  document.getElementById('course-banner').classList.remove('visible');
+  drawMap();
+}
+
+/* ═══════════════════════════════
+   COURSES RENDER
+═══════════════════════════════ */
+function renderFilters() {
+  const el = document.getElementById('filter-chips');
+  el.innerHTML = FILTERS.map(f => `
+    <button class="filter-chip ${f === activeFilter ? 'active' : ''}" onclick="setFilter('${f}')">${f}</button>
+  `).join('');
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  renderFilters();
+  renderCourses();
+}
+
+function diffDots(level, hard) {
+  return [1,2,3].map(i => `<div class="diff-dot ${i<=level?'on':''}${i<=level&&hard?' hard':''}"></div>`).join('');
+}
+
+function renderCourses() {
+  const list = document.getElementById('courses-list');
+  const filtered = activeFilter === '전체' ? COURSES : COURSES.filter(c => c.filter === activeFilter);
+
+  list.innerHTML = filtered.map(c => `
+    <div class="course-card" id="card-${c.id}">
+      <div class="course-map-preview">
+        <canvas id="preview-${c.id}"></canvas>
+        <div class="course-diff-badge">
+          <div class="diff-dots">${diffDots(c.difficulty, c.difficulty===3)}</div>
+          <span style="color:var(--ink-2);font-size:12px;font-weight:700">${['','쉬움','보통','어려움'][c.difficulty]}</span>
+        </div>
+      </div>
+      <div class="course-card-body">
+        <div class="course-card-top">
+          <div>
+            <div class="course-name">${c.name}</div>
+            <div class="course-area">${c.area}</div>
+          </div>
+          <button class="course-start-btn" onclick="event.stopPropagation();selectCourse(COURSES.find(x=>x.id==='${c.id}'))">시작하기</button>
+        </div>
+        <div class="course-stats-row">
+          <div class="course-stat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>
+            <span class="course-stat-val">${c.duration}</span><span class="course-stat-unit">분</span>
+          </div>
+          <div class="course-stat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+            <span class="course-stat-val">${c.distance}</span><span class="course-stat-unit">km</span>
+          </div>
+        </div>
+        <div class="course-tags">
+          ${c.tags.map((t,i) => `<span class="course-tag ${c.tagTypes[i]}">${t}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Draw previews after DOM insert
+  requestAnimationFrame(() => {
+    filtered.forEach(c => {
+      const canvas = document.getElementById(`preview-${c.id}`);
+      if (canvas) drawCoursePreview(canvas, c.routeShape, c);
+    });
+  });
+}
+
+/* ═══════════════════════════════
+   TAB SWITCHING
+═══════════════════════════════ */
+function switchTab(tab) {
+  state.tab = tab;
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById(`nav-${tab}`).classList.add('active');
+}
+
+/* ═══════════════════════════════
+   HISTORY RENDER
+═══════════════════════════════ */
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  document.getElementById('total-walks').textContent = state.history.length;
+
+  if (state.history.length === 0) {
+    list.innerHTML = '<div class="history-empty"><p>아직 기록이 없어요</p><p style="font-size:13px;color:var(--ink-3)">첫 산책을 시작해보세요</p></div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  state.history.forEach(h => {
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    card.innerHTML = `
+      <div class="hist-thumb"><canvas id="thumb-${h.id}" width="62" height="62"></canvas></div>
+      <div class="hist-info">
+        <div class="hist-date">${h.dateLabel} · ${h.timeLabel}</div>
+        <div class="hist-stats">
+          <span class="hist-main">${h.distance.toFixed(1)}</span>
+          <span class="hist-unit">km</span>
+          <span style="color:var(--ink-3);font-size:13px;margin-left:6px">·</span>
+          <span class="hist-main" style="font-size:20px">${formatTime(h.duration)}</span>
+        </div>
+        <div class="hist-secondary">${h.steps.toLocaleString('ko-KR')}걸음</div>
+      </div>
+      <svg class="hist-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+    `;
+    list.appendChild(card);
+    requestAnimationFrame(() => {
+      const c = document.getElementById(`thumb-${h.id}`);
+      if (c) drawThumb(c, h.route);
+    });
+  });
+}
+
+/* ═══════════════════════════════
+   GOALS RENDER
+═══════════════════════════════ */
+const DAYS_KO = ['월','화','수','목','금','토','일'];
+const weekData = [5200, 6100, 4800, 7300, 3124, 0, 0];
+const todayIdx = 4;
+
+function updateGoals() {
+  const dailyPct = Math.min(state.dailySteps / state.dailyGoal, 1);
+  const circumf = 238.76;
+  document.getElementById('daily-ring').style.strokeDashoffset = circumf * (1 - dailyPct);
+  document.getElementById('daily-count').innerHTML = `${state.dailySteps.toLocaleString('ko-KR')} <span class="unit">보</span>`;
+  document.getElementById('daily-chip').textContent = `${Math.round(dailyPct*100)}%`;
+
+  const barsEl = document.getElementById('week-bars');
+  const maxSteps = Math.max(...weekData, state.dailyGoal);
+  barsEl.innerHTML = DAYS_KO.map((day, i) => {
+    const steps = i===todayIdx ? state.dailySteps : weekData[i];
+    const pct = steps / maxSteps;
+    const isToday = i===todayIdx;
+    const isMet = steps>=state.dailyGoal;
+    const fillClass = isToday?'today':(isMet?'met':'');
+    return `
+      <div class="day-col">
+        <div class="day-track">
+          <div class="day-fill ${fillClass}" style="height:${Math.max(pct*100,3)}%"></div>
+        </div>
+        <div class="day-name ${isToday?'today':''}">${day}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ═══════════════════════════════
+   CLOCK
+═══════════════════════════════ */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+/* ═══════════════════════════════
+   INIT
+═══════════════════════════════ */
+window.addEventListener('load', () => {
+  initCanvas();
+  renderHistory();
+  updateGoals();
+  renderFilters();
+  renderCourses();
+  updateClock();
+  setInterval(updateClock, 10000);
+  obDrawWelcomeMap();
+  initPedometer();
+});
+
+window.addEventListener('resize', initCanvas);
+</script>
