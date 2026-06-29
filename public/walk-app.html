@@ -1867,9 +1867,9 @@ body {
   height: 52px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 8px;
   flex-shrink: 0;
-  visibility: hidden;
 }
 .ob-back {
   background: none;
@@ -1881,8 +1881,8 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  visibility: hidden;
 }
-
 .ob-skip {
   background: none;
   border: none;
@@ -1890,9 +1890,8 @@ body {
   font-weight: 400;
   color: var(--neutral-500);
   cursor: pointer;
-  padding: 4px 0;
-  text-align: center;
-  width: 100%;
+  padding: 8px;
+  display: none;
 }
 </style>
 
@@ -1909,6 +1908,7 @@ body {
           <path d="M15 18l-6-6 6-6"/>
         </svg>
       </button>
+      <button class="ob-skip" id="ob-skip" onclick="finishOnboarding()">건너뛰기</button>
     </div>
 
     <div class="ob-slides" id="ob-slides">
@@ -2034,7 +2034,6 @@ body {
       <button class="ob-cta" id="ob-cta" onclick="obNext()">
         <span id="ob-cta-label">시작하기</span>
       </button>
-      <button class="ob-skip" id="ob-skip" onclick="finishOnboarding()">건너뛰기</button>
     </div>
 
   </div><!-- /onboarding -->
@@ -2569,18 +2568,20 @@ function obUpdateUI() {
   document.getElementById('ob-slides').style.transform = `translateX(-${obStep * 100}%)`;
   document.querySelectorAll('.ob-dot').forEach((d, i) => d.classList.toggle('active', i === obStep));
   const header = document.getElementById('ob-header');
+  const back = document.getElementById('ob-back');
+  const skip = document.getElementById('ob-skip');
   if (obStep === 0) {
-    header.style.visibility = 'hidden';
+    back.style.visibility = 'hidden';
+    skip.style.display = 'block';
     document.getElementById('ob-cta-label').textContent = '시작하기';
-    document.getElementById('ob-skip').style.display = 'block';
   } else if (obStep === 1) {
-    header.style.visibility = 'visible';
+    back.style.visibility = 'visible';
+    skip.style.display = 'none';
     document.getElementById('ob-cta-label').textContent = '다음';
-    document.getElementById('ob-skip').style.display = 'none';
   } else {
-    header.style.visibility = 'visible';
+    back.style.visibility = 'visible';
+    skip.style.display = 'none';
     document.getElementById('ob-cta-label').textContent = '완료';
-    document.getElementById('ob-skip').style.display = 'none';
   }
 }
 
