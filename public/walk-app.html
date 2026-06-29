@@ -2048,6 +2048,32 @@ body {
 }
 .stats-overlay.hidden { display: none; }
 
+.stop-walk-fab {
+  position: absolute;
+  bottom: 114px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  height: 52px;
+  padding: 0 28px;
+  background: var(--neutral-1000);
+  color: var(--neutral-0);
+  border: none;
+  border-radius: 26px;
+  font: var(--B4); font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+.stop-walk-fab.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(8px);
+}
+.stop-walk-fab:active { opacity: 0.8; }
+
 .home-greeting {
   padding: 24px 20px 16px;
   display: flex; justify-content: space-between; align-items: flex-start;
@@ -2419,13 +2445,13 @@ body {
             <div class="stat-label">걸음</div>
           </div>
         </div>
-        <div class="btn-wrap">
-          <button class="btn-rec" id="btn-rec" aria-label="산책 시작">
-            <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg>
-            <svg id="icon-stop" viewBox="0 0 24 24" style="display:none"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>
-          </button>
-        </div>
       </div>
+
+      <!-- 그만하기 플로팅 버튼 (산책 중에만 노출) -->
+      <button class="stop-walk-fab hidden" id="stop-walk-fab" onclick="stopWalk()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg>
+        그만하기
+      </button>
     </div>
 
     <!-- ── COURSES TAB ── -->
@@ -3871,6 +3897,7 @@ function startWalk() {
   document.getElementById('icon-play').style.display = 'none';
   document.getElementById('icon-stop').style.display = 'block';
   document.getElementById('rec-badge').classList.add('visible');
+  document.getElementById('stop-walk-fab').classList.remove('hidden');
 
   tick();
   startRouteSimulation();
@@ -3887,6 +3914,7 @@ function stopWalk() {
   document.getElementById('icon-play').style.display = 'block';
   document.getElementById('icon-stop').style.display = 'none';
   document.getElementById('rec-badge').classList.remove('visible');
+  document.getElementById('stop-walk-fab').classList.add('hidden');
 
   // Sync pedo total if sensor is not active (simulation)
   if (!pedo.sensorActive) {
