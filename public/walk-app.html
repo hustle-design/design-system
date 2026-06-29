@@ -4079,9 +4079,7 @@ function openReportSheet() {
 }
 function closeReportSheet() {
   document.getElementById('report-sheet').classList.remove('open');
-  if (document.getElementById('tab-courses').classList.contains('active')) {
-    document.getElementById('report-fab').classList.remove('hidden');
-  }
+  document.getElementById('report-fab').classList.remove('hidden');
 }
 function renderReportHistList() {
   const list = document.getElementById('report-hist-list');
