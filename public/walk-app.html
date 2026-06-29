@@ -3898,6 +3898,8 @@ function startWalk() {
   document.getElementById('icon-stop').style.display = 'block';
   document.getElementById('rec-badge').classList.add('visible');
   document.getElementById('stop-walk-fab').classList.remove('hidden');
+  document.getElementById('nav').style.opacity = '0';
+  document.getElementById('nav').style.pointerEvents = 'none';
 
   tick();
   startRouteSimulation();
@@ -3915,6 +3917,8 @@ function stopWalk() {
   document.getElementById('icon-stop').style.display = 'none';
   document.getElementById('rec-badge').classList.remove('visible');
   document.getElementById('stop-walk-fab').classList.add('hidden');
+  document.getElementById('nav').style.opacity = '1';
+  document.getElementById('nav').style.pointerEvents = '';
 
   // Sync pedo total if sensor is not active (simulation)
   if (!pedo.sensorActive) {
