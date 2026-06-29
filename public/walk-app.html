@@ -1800,6 +1800,26 @@ body {
 
 .ob-cta svg { width: 18px; height: 18px; fill: white; }
 
+.ob-header {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  flex-shrink: 0;
+  visibility: hidden;
+}
+.ob-back {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
 .ob-skip {
   background: none;
   border: none;
@@ -1819,6 +1839,14 @@ body {
        ONBOARDING OVERLAY
   ══════════════════════════════ -->
   <div id="onboarding">
+
+    <div class="ob-header" id="ob-header">
+      <button class="ob-back" id="ob-back" onclick="obPrev()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+    </div>
 
     <div class="ob-slides" id="ob-slides">
 
@@ -2399,20 +2427,38 @@ function toggleTheme(el) {
   }
 }
 
+function obUpdateUI() {
+  document.getElementById('ob-slides').style.transform = `translateX(-${obStep * 100}%)`;
+  document.querySelectorAll('.ob-dot').forEach((d, i) => d.classList.toggle('active', i === obStep));
+  const header = document.getElementById('ob-header');
+  if (obStep === 0) {
+    header.style.visibility = 'hidden';
+    document.getElementById('ob-cta-label').textContent = '시작하기';
+    document.getElementById('ob-skip').style.display = 'none';
+  } else if (obStep === 1) {
+    header.style.visibility = 'visible';
+    document.getElementById('ob-cta-label').textContent = '다음';
+    document.getElementById('ob-skip').style.display = 'block';
+  } else {
+    header.style.visibility = 'visible';
+    document.getElementById('ob-cta-label').textContent = '완료';
+    document.getElementById('ob-skip').style.display = 'none';
+  }
+}
+
 function obNext() {
   if (obStep < 2) {
     obStep++;
-    document.getElementById('ob-slides').style.transform = `translateX(-${obStep * 100}%)`;
-    document.querySelectorAll('.ob-dot').forEach((d, i) => d.classList.toggle('active', i === obStep));
-    if (obStep === 1) {
-      document.getElementById('ob-cta-label').textContent = '다음';
-      document.getElementById('ob-skip').style.display = 'block';
-    } else {
-      document.getElementById('ob-cta-label').textContent = '완료';
-      document.getElementById('ob-skip').style.display = 'none';
-    }
+    obUpdateUI();
   } else {
     finishOnboarding();
+  }
+}
+
+function obPrev() {
+  if (obStep > 0) {
+    obStep--;
+    obUpdateUI();
   }
 }
 
