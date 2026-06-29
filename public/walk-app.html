@@ -429,33 +429,53 @@ body {
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   z-index: 9;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
 }
 .report-fab:active { transform: scale(0.93); box-shadow: 0 2px 8px rgba(0,0,0,0.14); }
 .report-fab svg { width: 22px; height: 22px; color: var(--neutral-0); }
+.report-fab.hidden { opacity: 0; pointer-events: none; }
 
 #report-sheet {
   position: absolute;
   inset: 0;
-  z-index: 55;
+  z-index: 60;
   pointer-events: none;
+  background: var(--neutral-0);
+  transform: translateX(100%);
+  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
-#report-sheet .course-sheet-backdrop {
-  background: rgba(0,0,0,0);
-  transition: background 0.35s ease;
-}
-#report-sheet.open .course-sheet-backdrop {
-  background: rgba(0,0,0,0.36);
+#report-sheet.open {
+  transform: translateX(0);
   pointer-events: all;
 }
+#report-sheet .course-sheet-backdrop { display: none; }
 #report-sheet .course-sheet-panel {
-  max-height: 92%;
+  flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+  position: static;
+  transform: none;
+  max-height: none;
+  background: none;
 }
 .report-sheet-head {
-  padding: 24px 20px 8px;
-  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 20px 8px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--neutral-300);
+  flex-shrink: 0;
 }
+.report-back-btn {
+  width: 36px; height: 36px;
+  background: none; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--neutral-1000); flex-shrink: 0; margin-left: -6px;
+}
+.report-back-btn svg { width: 22px; height: 22px; }
 .report-sheet-title { font: var(--H4); font-weight: 700; color: var(--neutral-1000); }
 .report-close-btn {
   width: 36px; height: 36px;
@@ -2168,12 +2188,7 @@ body {
       <div class="filter-scroll" id="filter-chips"></div>
       <div class="courses-list" id="courses-list"></div>
 
-      <!-- 산책로 제보 FAB -->
-      <button class="report-fab" onclick="openReportSheet()" aria-label="산책로 제보하기">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <path d="M12 5v14M5 12h14"/>
-        </svg>
-      </button>
+
 
     </div>
 
@@ -2313,16 +2328,23 @@ body {
   </div>
 
 
+  <!-- 산책로 제보 FAB -->
+  <button class="report-fab" id="report-fab" onclick="openReportSheet()" aria-label="산책로 제보하기">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
+  </button>
+
   <!-- ── REPORT SHEET ── -->
   <div id="report-sheet">
     <div class="course-sheet-backdrop" onclick="closeReportSheet()"></div>
     <div class="course-sheet-panel">
       <div class="sheet-handle"></div>
       <div class="report-sheet-head">
-        <div class="report-sheet-title">산책로 제보</div>
-        <button class="report-close-btn" onclick="closeReportSheet()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <button class="report-back-btn" onclick="closeReportSheet()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
+        <div class="report-sheet-title">산책로 제보</div>
       </div>
       <div class="report-body">
         <div>
@@ -3882,6 +3904,8 @@ function renderCourses() {
    TAB SWITCHING
 ═══════════════════════════════ */
 function switchTab(tab) {
+  const fab = document.getElementById('report-fab');
+  if (fab) fab.classList.toggle('hidden', tab !== 'courses');
   state.tab = tab;
   document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -3986,12 +4010,16 @@ window.addEventListener('load', () => {
 
 function openReportSheet() {
   document.getElementById('report-sheet').classList.add('open');
-  document.getElementById('report-sheet').style.pointerEvents = 'all';
+  document.getElementById('report-fab').classList.add('hidden');
 }
 function closeReportSheet() {
   const s = document.getElementById('report-sheet');
   s.classList.remove('open');
-  s.style.pointerEvents = 'none';
+  const fab = document.getElementById('report-fab');
+  if (document.querySelector('#nav-courses.active, #nav-courses[data-active]') ||
+      document.getElementById('tab-courses').classList.contains('active')) {
+    fab.classList.remove('hidden');
+  }
 }
 function toggleReportTag(el) {
   el.classList.toggle('selected');
