@@ -4253,6 +4253,23 @@ function switchTab(tab) {
    HOME PANEL
 ═══════════════════════════════ */
 let homeRecIdx = 0;
+
+// 시간대별 코스 추천 매핑
+const TIME_REC = [
+  // [시작h, 종료h, courseId, 헤더 레이블]
+  { from: 0,  to: 5,  id: 'neighborhood', label: '새벽엔 조용한 동네 한 바퀴 🌙' },
+  { from: 5,  to: 9,  id: 'morning',      label: '상쾌한 아침 모닝 워크 🌅'       },
+  { from: 9,  to: 11, id: 'anyangcheon',  label: '오전엔 생태 하천길이 딱이에요 🌿' },
+  { from: 11, to: 14, id: 'cheonggyecheon', label: '점심시간 짧고 가볍게! 🥗'    },
+  { from: 14, to: 17, id: 'namsan',       label: '오후엔 뷰포인트 코스 어때요? ⛰️' },
+  { from: 17, to: 20, id: 'hangang',      label: '저녁 노을 따라 강변 산책 🌇'    },
+  { from: 20, to: 24, id: 'hangang',      label: '밤 야경이 아름다운 코스 🌃'     },
+];
+function getTimeRec() {
+  const h = new Date().getHours();
+  return TIME_REC.find(r => h >= r.from && h < r.to) || TIME_REC[1];
+}
+
 const STREAK_DAYS = ['월','화','수','목','금','토','일'];
 const streakDone = [false, false, false, false, true, true, true]; // 목~일 체크 (프로토타입)
 const streakToday = 4; // 금요일 인덱스
@@ -4293,14 +4310,16 @@ function renderHomePanel() {
     return `<div class="home-streak-day ${cls}">${streakDone[i] ? '<span class="streak-check">✓</span>' : d}</div>`;
   }).join('');
 
-  // 추천 코스
-  const rec = COURSES[homeRecIdx % COURSES.length];
+  // 시간대별 추천 코스
+  const timeRec = getTimeRec();
+  const rec = COURSES.find(c => c.id === timeRec.id) || COURSES[0];
+  homeRecIdx = COURSES.indexOf(rec);
+  document.getElementById('home-rec-title').textContent = timeRec.label;
   if (rec) {
     document.getElementById('home-rec-name').textContent = rec.name;
     document.getElementById('home-rec-meta').textContent = `${rec.distance}km · ${rec.duration}분 · ${rec.area}`;
     const tagsEl = document.getElementById('home-rec-tags');
     tagsEl.innerHTML = (rec.tags || []).slice(0,3).map(t => `<span class="home-rec-tag">${t}</span>`).join('');
-    // 썸네일 그리기
     requestAnimationFrame(() => {
       const cv = document.getElementById('home-rec-canvas');
       if (cv) {
