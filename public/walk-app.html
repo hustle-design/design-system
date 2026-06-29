@@ -180,10 +180,14 @@ body {
   background: linear-gradient(
     to top,
     rgba(255,255,255,1) 0%,
-    rgba(255,255,255,0.97) 55%,
+    rgba(255,255,255,0.97) 60%,
     rgba(255,255,255,0) 100%
   );
-  padding: 64px 24px 24px;
+  padding: 64px 24px calc(32px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 /* Course banner */
@@ -272,8 +276,8 @@ body {
 .stats-row {
   display: flex;
   align-items: flex-end;
-  margin-bottom: 24px;
   gap: 0;
+  width: 100%;
 }
 
 .stat-item { flex: 1; }
@@ -433,35 +437,52 @@ body {
 }
 .report-fab:active { transform: scale(0.93); box-shadow: 0 2px 8px rgba(0,0,0,0.14); }
 .report-fab svg { width: 22px; height: 22px; color: var(--neutral-0); }
-.report-fab.hidden { opacity: 0; pointer-events: none; }
+.report-fab.hidden { display: none; }
 
 #report-sheet {
   position: absolute;
   inset: 0;
   z-index: 60;
   pointer-events: none;
-  background: var(--neutral-0);
-  transform: translateX(100%);
-  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  background: transparent;
+  transition: background 0.32s;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  justify-content: flex-end;
 }
 #report-sheet.open {
-  transform: translateX(0);
   pointer-events: all;
+  background: rgba(0,0,0,0.42);
 }
-#report-sheet .course-sheet-backdrop { display: none; }
+#report-sheet .course-sheet-backdrop {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
 #report-sheet .course-sheet-panel {
-  flex: 1;
+  position: relative;
+  z-index: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  border-radius: 0;
-  position: static;
-  transform: none;
-  max-height: none;
-  background: none;
+  border-radius: 20px 20px 0 0;
+  background: var(--neutral-0);
+  max-height: 88vh;
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+#report-sheet.open .course-sheet-panel {
+  transform: translateY(0);
+}
+#report-sheet .course-sheet-panel::before {
+  content: '';
+  display: block;
+  width: 36px; height: 4px;
+  background: var(--neutral-400);
+  border-radius: 2px;
+  margin: 12px auto 4px;
+  flex-shrink: 0;
 }
 .report-sheet-head {
   padding: 20px 20px 8px;
@@ -2049,11 +2070,8 @@ body {
 .stats-overlay.hidden { display: none; }
 
 .stop-walk-fab {
-  position: absolute;
-  bottom: 114px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 11;
+  align-self: center;
+  margin-top: 20px;
   height: 52px;
   padding: 0 28px;
   background: var(--neutral-1000);
@@ -2064,14 +2082,9 @@ body {
   display: flex; align-items: center; gap: 8px;
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(0,0,0,0.22);
-  transition: opacity 0.2s, transform 0.2s;
   white-space: nowrap;
 }
-.stop-walk-fab.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(-50%) translateY(8px);
-}
+.stop-walk-fab.hidden { display: none; }
 .stop-walk-fab:active { opacity: 0.8; }
 
 .home-greeting {
@@ -2445,13 +2458,11 @@ body {
             <div class="stat-label">걸음</div>
           </div>
         </div>
+        <button class="stop-walk-fab hidden" id="stop-walk-fab" onclick="stopWalk()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg>
+          그만하기
+        </button>
       </div>
-
-      <!-- 그만하기 플로팅 버튼 (산책 중에만 노출) -->
-      <button class="stop-walk-fab hidden" id="stop-walk-fab" onclick="stopWalk()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg>
-        그만하기
-      </button>
     </div>
 
     <!-- ── COURSES TAB ── -->
@@ -2624,7 +2635,7 @@ body {
 
 
   <!-- 산책로 제보 FAB -->
-  <button class="report-fab" id="report-fab" onclick="openReportSheet()" aria-label="산책로 제보하기">
+  <button class="report-fab hidden" id="report-fab" onclick="openReportSheet()" aria-label="산책로 제보하기">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
       <path d="M12 5v14M5 12h14"/>
     </svg>
@@ -3896,6 +3907,7 @@ function startWalk() {
 
   document.getElementById('rec-badge').classList.add('visible');
   document.getElementById('stop-walk-fab').classList.remove('hidden');
+  document.getElementById('report-fab').classList.add('hidden');
   document.getElementById('nav').style.opacity = '0';
   document.getElementById('nav').style.pointerEvents = 'none';
 
@@ -3913,6 +3925,7 @@ function stopWalk() {
   document.getElementById('stop-walk-fab').classList.add('hidden');
   document.getElementById('nav').style.opacity = '1';
   document.getElementById('nav').style.pointerEvents = '';
+  if (state.tab === 'history') document.getElementById('report-fab').classList.remove('hidden');
 
   // Sync pedo total if sensor is not active (simulation)
   if (!pedo.sensorActive) {
