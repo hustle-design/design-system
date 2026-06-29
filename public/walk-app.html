@@ -2428,11 +2428,11 @@ function obUpdateUI() {
   if (obStep === 0) {
     header.style.visibility = 'hidden';
     document.getElementById('ob-cta-label').textContent = '시작하기';
-    document.getElementById('ob-skip').style.display = 'none';
+    document.getElementById('ob-skip').style.display = 'block';
   } else if (obStep === 1) {
     header.style.visibility = 'visible';
     document.getElementById('ob-cta-label').textContent = '다음';
-    document.getElementById('ob-skip').style.display = 'block';
+    document.getElementById('ob-skip').style.display = 'none';
   } else {
     header.style.visibility = 'visible';
     document.getElementById('ob-cta-label').textContent = '완료';
