@@ -3936,8 +3936,11 @@ function stopWalk() {
     state.dailySteps += state.steps;
     renderHistory();
     updateGoals();
-    // Ask to save as personal archive
-    setTimeout(() => openSaveSheet(entry), 500);
+    if (entry.followingServiceCourse) {
+      setTimeout(() => openSaveSheet(entry), 500);
+    } else {
+      setTimeout(() => openReportSheetForNewRoute(entry), 500);
+    }
   }
 
   document.getElementById('timer-display').textContent = '00:00';
@@ -4545,9 +4548,48 @@ function goReportStep2() {
   }
 }
 function toggleReportTag(el) { el.classList.toggle('selected'); }
+let pendingReportEntry = null;
+
+function openReportSheetForNewRoute(histEntry) {
+  pendingReportEntry = histEntry;
+  document.getElementById('report-sheet').classList.add('open');
+  document.getElementById('report-fab').classList.add('hidden');
+  // Step 1 건너뛰고 Step 2 바로
+  goReportStep2Direct();
+}
+
+function goReportStep2Direct() {
+  document.getElementById('report-step1').classList.remove('active');
+  document.getElementById('report-step2').classList.add('active');
+  document.getElementById('report-name').value = '';
+  document.getElementById('report-name').placeholder = '예) 방금 걸은 코스 이름';
+  // 태그 초기화
+  document.querySelectorAll('.report-tag').forEach(t => t.classList.remove('selected'));
+}
+
 function submitReport() {
   const name = document.getElementById('report-name').value.trim();
   if (!name) { document.getElementById('report-name').focus(); return; }
+
+  // 신규 경로인 경우 아카이브에도 저장
+  if (pendingReportEntry) {
+    const archive = {
+      id: Date.now(),
+      name,
+      distance: pendingReportEntry.distance,
+      duration: pendingReportEntry.duration,
+      steps: pendingReportEntry.steps,
+      route: pendingReportEntry.route,
+      dateLabel: pendingReportEntry.dateLabel,
+      savedAt: new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }),
+      isServiceCourse: false,
+    };
+    myArchives.unshift(archive);
+    renderMyCourses();
+    renderHistory();
+    pendingReportEntry = null;
+  }
+
   closeReportSheet();
   showToast('제보해주셔서 감사해요! 검토 후 등록됩니다 🙏');
 }
