@@ -1491,7 +1491,7 @@ body {
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0 28px;
+  padding: 0 20px;
   flex-shrink: 0;
 }
 
@@ -1502,6 +1502,7 @@ body {
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow: hidden;
 }
 
 .ob-map-circle {
@@ -1546,77 +1547,8 @@ body {
   100% { opacity: 0; transform: scale(1.06); }
 }
 
-/* Float animation for map circle */
-@keyframes ob-float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
-}
-
-.ob-map-float {
-  animation: ob-float 4s ease-in-out infinite;
-}
-
-/* Stats pills */
-.ob-stat-pills {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.ob-stat-pill {
-  position: absolute;
-  background: white;
-  border-radius: 20px;
-  padding: 8px 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0;
-  animation: ob-pill-in 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
-}
-
-.ob-stat-pill-icon {
-  width: 24px; height: 24px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px;
-  flex-shrink: 0;
-}
-
-.ob-stat-pill-text { line-height: 1.2; }
-.ob-stat-pill-val {
-  font: var(--B5);
-  font-weight: 700;
-  color: var(--ink);
-}
-.ob-stat-pill-lbl {
-  font: var(--C2);
-  color: var(--ink-2);
-}
-
-.ob-stat-pill:nth-child(1) {
-  top: 12%; left: -8%;
-  animation-delay: 0.6s;
-}
-.ob-stat-pill:nth-child(2) {
-  top: 18%; right: -8%;
-  animation-delay: 0.9s;
-}
-.ob-stat-pill:nth-child(3) {
-  bottom: 14%; left: -4%;
-  animation-delay: 1.2s;
-}
-
-@keyframes ob-pill-in {
-  from { opacity: 0; transform: translateY(8px) scale(0.9); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .ob-ring { animation: none; opacity: 0.12; }
-  .ob-map-float { animation: none; }
-  .ob-stat-pill { animation: none; opacity: 1; }
 }
 
 .ob-welcome-body {
@@ -1920,30 +1852,7 @@ body {
             <div class="ob-ring"></div>
             <div class="ob-ring"></div>
           </div>
-          <div class="ob-stat-pills">
-            <div class="ob-stat-pill">
-              <div class="ob-stat-pill-icon" style="background:#f3f4f5">🚶</div>
-              <div class="ob-stat-pill-text">
-                <div class="ob-stat-pill-val">6,240보</div>
-                <div class="ob-stat-pill-lbl">오늘 걸음</div>
-              </div>
-            </div>
-            <div class="ob-stat-pill">
-              <div class="ob-stat-pill-icon" style="background:#edfaf6">🌿</div>
-              <div class="ob-stat-pill-text">
-                <div class="ob-stat-pill-val">4.2km</div>
-                <div class="ob-stat-pill-lbl">서리풀공원</div>
-              </div>
-            </div>
-            <div class="ob-stat-pill">
-              <div class="ob-stat-pill-icon" style="background:#fff4e0">⏱</div>
-              <div class="ob-stat-pill-text">
-                <div class="ob-stat-pill-val">38분</div>
-                <div class="ob-stat-pill-lbl">예상 시간</div>
-              </div>
-            </div>
-          </div>
-          <div class="ob-map-circle ob-map-float">
+          <div class="ob-map-circle">
             <canvas id="ob-map-canvas"></canvas>
           </div>
         </div>
@@ -2424,7 +2333,7 @@ function obDrawWelcomeMap() {
   const ctx = canvas.getContext('2d');
   ctx.scale(d, d);
 
-  // Build route points
+  // Route points
   const pts = [];
   for (let i = 0; i <= 120; i++) {
     const t = (i / 120) * Math.PI * 2;
@@ -2436,18 +2345,14 @@ function obDrawWelcomeMap() {
 
   function drawBase() {
     ctx.clearRect(0, 0, S, S);
-
-    // Terrain bg
     ctx.fillStyle = '#C8DCC8';
     ctx.fillRect(0, 0, S, S);
 
-    // City blocks
     ctx.fillStyle = '#B8CEB8';
     [[0,0,S*.28,S*.3],[S*.36,0,S*.26,S*.3],[S*.7,0,S*.3,S*.3],
      [0,S*.38,S*.28,S*.26],[S*.7,S*.38,S*.3,S*.26],
      [0,S*.72,S*.42,S*.28],[S*.52,S*.72,S*.48,S*.28]].forEach(([x,y,w,h])=>ctx.fillRect(x,y,w,h));
 
-    // Park
     ctx.fillStyle = '#A4C4A4';
     ctx.fillRect(S*.36, S*.38, S*.26, S*.26);
     ctx.fillStyle = '#8CAE8C';
@@ -2455,77 +2360,71 @@ function obDrawWelcomeMap() {
       ctx.beginPath(); ctx.arc(tx, ty, 5.5, 0, Math.PI*2); ctx.fill();
     });
 
-    // Roads
     ctx.fillStyle = '#DCE8DC';
     [S*.3, S*.64].forEach(ry => ctx.fillRect(0, ry, S, S*.06));
     [S*.28, S*.56].forEach(rx => ctx.fillRect(rx, 0, S*.06, S));
-  }
 
-  function drawRoute(progress) {
-    const end = Math.floor(progress * (pts.length - 1));
-    const slice = pts.slice(0, end + 1);
-    if (slice.length < 2) return;
-
-    // Glow shadow
+    // Full route (static)
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(26,28,32,0.12)';
-    ctx.lineWidth = 10;
+    ctx.strokeStyle = 'rgba(26,28,32,0.10)';
+    ctx.lineWidth = 8;
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.moveTo(slice[0].x, slice[0].y);
-    slice.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
     ctx.stroke();
 
-    // Trail
     ctx.beginPath();
     ctx.strokeStyle = '#1A1C20';
-    ctx.lineWidth = 3.5;
+    ctx.lineWidth = 3;
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    ctx.moveTo(slice[0].x, slice[0].y);
-    slice.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
     ctx.stroke();
   }
 
-  function drawDot(p, pulse) {
-    // Pulse halo
-    const haloR = 14 + pulse * 6;
-    ctx.beginPath();
-    ctx.fillStyle = `rgba(26,28,32,${0.08 * (1 - pulse)})`;
-    ctx.arc(p.x, p.y, haloR, 0, Math.PI*2);
-    ctx.fill();
+  function drawFootprint(x, y, angle) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle - Math.PI / 2);
 
-    // Dot
-    ctx.beginPath();
+    const sz = 9;
     ctx.fillStyle = '#1A1C20';
-    ctx.arc(p.x, p.y, 7, 0, Math.PI*2);
+
+    // Sole
+    ctx.beginPath();
+    ctx.ellipse(0, sz * 0.1, sz * 0.42, sz * 0.62, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
+
+    // Toes
+    const toes = [
+      [-sz*.38, -sz*.68, sz*.16, sz*.19],
+      [-sz*.16, -sz*.78, sz*.16, sz*.19],
+      [ sz*.06, -sz*.76, sz*.15, sz*.18],
+      [ sz*.26, -sz*.66, sz*.14, sz*.17],
+      [ sz*.40, -sz*.50, sz*.12, sz*.15],
+    ];
+    toes.forEach(([tx,ty,rx,ry]) => {
+      ctx.beginPath();
+      ctx.ellipse(tx, ty, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.restore();
   }
 
-  const DRAW_DUR = 1800; // ms to draw route
-  const start = performance.now();
+  const LOOP_DUR = 9000; // 9s per full loop — slow & steady
+  const startTime = performance.now();
 
   function frame(now) {
-    const elapsed = now - start;
-    const drawProgress = Math.min(elapsed / DRAW_DUR, 1);
-    // ease out
-    const eased = 1 - Math.pow(1 - drawProgress, 3);
+    const t = ((now - startTime) % LOOP_DUR) / LOOP_DUR;
+    const idx = Math.floor(t * (pts.length - 1));
+    const nextIdx = (idx + 1) % pts.length;
+    const p = pts[idx];
+    const pNext = pts[nextIdx];
+    const angle = Math.atan2(pNext.y - p.y, pNext.x - p.x);
 
     drawBase();
-    drawRoute(eased);
-
-    // After route is drawn, animate dot looping
-    let dotIdx;
-    if (drawProgress >= 1) {
-      const loopT = ((now - (start + DRAW_DUR)) / 3000) % 1;
-      dotIdx = Math.floor(loopT * (pts.length - 1));
-    } else {
-      dotIdx = Math.floor(eased * (pts.length - 1));
-    }
-
-    const pulse = (Math.sin(now / 600) + 1) / 2;
-    drawDot(pts[dotIdx], pulse);
+    drawFootprint(p.x, p.y, angle);
 
     obMapRaf = requestAnimationFrame(frame);
   }
@@ -2571,11 +2470,11 @@ function obUpdateUI() {
   const skip = document.getElementById('ob-skip');
   if (obStep === 0) {
     back.style.visibility = 'hidden';
-    skip.style.display = 'block';
+    skip.style.display = 'none';
     document.getElementById('ob-cta-label').textContent = '시작하기';
   } else if (obStep === 1) {
     back.style.visibility = 'visible';
-    skip.style.display = 'none';
+    skip.style.display = 'block';
     document.getElementById('ob-cta-label').textContent = '다음';
   } else {
     back.style.visibility = 'visible';
