@@ -2032,6 +2032,143 @@ body {
   padding: 0;
   display: none;
 }
+
+/* ═══════ HOME PANEL ═══════ */
+#home-panel {
+  position: absolute; inset: 0;
+  overflow-y: auto; overflow-x: hidden;
+  padding-bottom: 110px;
+  background: var(--neutral-100);
+  z-index: 2;
+  transition: opacity 0.28s, transform 0.28s;
+}
+#home-panel.hidden {
+  opacity: 0; pointer-events: none;
+  transform: translateY(8px);
+}
+.stats-overlay.hidden { display: none; }
+
+.home-greeting {
+  padding: 24px 20px 16px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.home-hi { font-size: 22px; font-weight: 800; line-height: 1.25; color: var(--neutral-1000); letter-spacing: -0.02em; }
+.home-date { font: var(--B5); color: var(--ink-3); margin-top: 3px; }
+.home-weather-pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--neutral-0); border-radius: 20px;
+  padding: 7px 13px;
+  font: var(--B5); font-weight: 600; color: var(--neutral-800);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  white-space: nowrap;
+}
+
+/* Hero card */
+.home-hero {
+  margin: 0 16px 12px;
+  background: var(--neutral-0);
+  border-radius: 24px;
+  padding: 22px 22px 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.home-hero-eyebrow {
+  font: var(--C1); font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.home-ring-row {
+  display: flex; align-items: center; gap: 20px;
+  margin: 16px 0 18px;
+}
+.home-ring-svg { width: 92px; height: 92px; flex-shrink: 0; }
+.home-step-num {
+  font-size: 42px; font-weight: 900; line-height: 1;
+  color: var(--neutral-1000); letter-spacing: -0.04em;
+}
+.home-step-unit { font: var(--B3); color: var(--neutral-700); }
+.home-goal-remain { font: var(--B5); color: var(--ink-3); margin-top: 6px; line-height: 1.4; }
+.home-stat-strip {
+  display: flex;
+  border-top: 1px solid var(--neutral-200);
+  padding-top: 16px; margin-top: 2px;
+}
+.home-stat-cell { flex: 1; text-align: center; }
+.home-stat-cell + .home-stat-cell { border-left: 1px solid var(--neutral-200); }
+.home-stat-v { font: var(--B4); font-weight: 700; color: var(--neutral-1000); }
+.home-stat-l { font: var(--C1); color: var(--ink-3); margin-top: 2px; }
+.home-start-btn {
+  width: 100%; height: 54px; margin-top: 16px;
+  background: var(--neutral-1000); color: var(--neutral-0);
+  border: none; border-radius: 28px;
+  font: var(--B3); font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity 0.15s;
+}
+.home-start-btn:active { opacity: 0.82; }
+
+/* Streak card */
+.home-streak {
+  margin: 0 16px 12px;
+  background: var(--neutral-0);
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.home-streak-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.home-streak-flame { font-size: 24px; line-height: 1; }
+.home-streak-title { font: var(--B4); font-weight: 700; color: var(--neutral-1000); }
+.home-streak-sub { font: var(--B5); color: var(--ink-3); margin-top: 2px; }
+.home-streak-week { display: flex; gap: 5px; }
+.home-streak-day {
+  flex: 1; aspect-ratio: 1; border-radius: 50%;
+  background: var(--neutral-200);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; color: var(--ink-3);
+}
+.home-streak-day.done { background: var(--neutral-1000); color: var(--neutral-0); }
+.home-streak-day.today { background: var(--neutral-400); color: var(--neutral-800); }
+.home-streak-day .streak-check { font-size: 11px; }
+
+/* Recommended course card */
+.home-rec {
+  margin: 0 16px 12px;
+  background: var(--neutral-0);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.home-rec-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 20px 12px;
+}
+.home-rec-title { font: var(--B4); font-weight: 700; color: var(--neutral-1000); }
+.home-rec-more { font: var(--B5); color: var(--ink-3); cursor: pointer; }
+.home-rec-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 20px 18px;
+}
+.home-rec-thumb {
+  width: 72px; height: 72px; border-radius: 14px;
+  background: var(--neutral-100); overflow: hidden; flex-shrink: 0;
+}
+.home-rec-thumb canvas { width: 100%; height: 100%; display: block; }
+.home-rec-info { flex: 1; min-width: 0; }
+.home-rec-name { font: var(--B4); font-weight: 700; color: var(--neutral-1000); }
+.home-rec-meta { font: var(--B5); color: var(--ink-3); margin-top: 3px; }
+.home-rec-tags { display: flex; gap: 4px; margin-top: 7px; flex-wrap: wrap; }
+.home-rec-tag {
+  padding: 3px 8px; border-radius: 8px;
+  background: var(--neutral-100);
+  font-size: 11px; color: var(--neutral-700);
+}
+.home-rec-btn {
+  padding: 9px 14px; flex-shrink: 0;
+  background: var(--neutral-100); border: none; border-radius: 16px;
+  font: var(--B5); font-weight: 700; color: var(--neutral-1000);
+  cursor: pointer; transition: background 0.15s;
+  white-space: nowrap; align-self: center;
+}
+.home-rec-btn:active { background: var(--neutral-300); }
+
 </style>
 </head>
 <body>
@@ -2163,7 +2300,89 @@ body {
       <div id="pedo-sensor-dot" style="display:none"></div>
       <div id="pedo-ring" style="display:none"></div>
 
-      <div class="stats-overlay">
+      <!-- ── 홈 패널 (산책 전) ── -->
+      <div id="home-panel">
+
+        <!-- 인사 헤더 -->
+        <div class="home-greeting">
+          <div>
+            <div class="home-hi" id="home-hi">좋은 아침이에요 👋</div>
+            <div class="home-date" id="home-date">6월 29일 일요일</div>
+          </div>
+          <div class="home-weather-pill">⛅ 24°</div>
+        </div>
+
+        <!-- 오늘 걸음 히어로 카드 -->
+        <div class="home-hero">
+          <div class="home-hero-eyebrow">오늘 걸음</div>
+          <div class="home-ring-row">
+            <svg class="home-ring-svg" viewBox="0 0 92 92">
+              <circle cx="46" cy="46" r="38" fill="none" stroke="var(--neutral-200)" stroke-width="8"/>
+              <circle cx="46" cy="46" r="38" fill="none" stroke="var(--neutral-1000)" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="238.76"
+                id="home-ring-fill" stroke-dashoffset="114.6"
+                transform="rotate(-90 46 46)"/>
+            </svg>
+            <div>
+              <div>
+                <span class="home-step-num" id="home-step-num">3,124</span>
+                <span class="home-step-unit"> 보</span>
+              </div>
+              <div class="home-goal-remain" id="home-goal-remain">목표까지 2,876보 남았어요</div>
+            </div>
+          </div>
+          <div class="home-stat-strip">
+            <div class="home-stat-cell">
+              <div class="home-stat-v" id="home-stat-dist">2.3km</div>
+              <div class="home-stat-l">거리</div>
+            </div>
+            <div class="home-stat-cell">
+              <div class="home-stat-v" id="home-stat-time">28분</div>
+              <div class="home-stat-l">활동시간</div>
+            </div>
+            <div class="home-stat-cell">
+              <div class="home-stat-v" id="home-stat-kcal">187kcal</div>
+              <div class="home-stat-l">칼로리</div>
+            </div>
+          </div>
+          <button class="home-start-btn" onclick="startWalkFromHome()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+            산책 시작하기
+          </button>
+        </div>
+
+        <!-- 스트릭 카드 -->
+        <div class="home-streak">
+          <div class="home-streak-top">
+            <span class="home-streak-flame">🔥</span>
+            <div>
+              <div class="home-streak-title" id="home-streak-title">3일 연속 산책 중</div>
+              <div class="home-streak-sub" id="home-streak-sub">오늘도 걸으면 4일 연속!</div>
+            </div>
+          </div>
+          <div class="home-streak-week" id="home-streak-week"></div>
+        </div>
+
+        <!-- 추천 코스 카드 -->
+        <div class="home-rec">
+          <div class="home-rec-head">
+            <div class="home-rec-title">오늘 이 코스 어때요?</div>
+            <div class="home-rec-more" onclick="switchTab('courses')">더보기</div>
+          </div>
+          <div class="home-rec-item" id="home-rec-item">
+            <div class="home-rec-thumb"><canvas id="home-rec-canvas" width="72" height="72"></canvas></div>
+            <div class="home-rec-info">
+              <div class="home-rec-name" id="home-rec-name">청계천 점심 코스</div>
+              <div class="home-rec-meta" id="home-rec-meta">2.2km · 28분 · 종로·을지로</div>
+              <div class="home-rec-tags" id="home-rec-tags"></div>
+            </div>
+            <button class="home-rec-btn" id="home-rec-btn" onclick="startRecCourse()">따라 걷기</button>
+          </div>
+        </div>
+
+      </div><!-- /home-panel -->
+
+      <div class="stats-overlay hidden">
         <!-- Active course banner -->
         <div class="course-banner" id="course-banner">
           <div class="course-banner-icon">
@@ -3624,6 +3843,23 @@ function toggleWalk() {
   state.isWalking ? stopWalk() : startWalk();
 }
 
+function startWalkFromHome() {
+  document.getElementById('home-panel').classList.add('hidden');
+  document.querySelector('.stats-overlay').classList.remove('hidden');
+  startWalk();
+}
+function startRecCourse() {
+  const course = COURSES[homeRecIdx % COURSES.length];
+  if (course) {
+    activeCourse = course;
+    document.getElementById('banner-name').textContent = course.name;
+    document.getElementById('banner-meta').textContent = `${course.distance}km · 약 ${course.duration}분`;
+    document.getElementById('course-banner').classList.add('visible');
+    drawMap();
+  }
+  startWalkFromHome();
+}
+
 function startWalk() {
   state.isWalking = true;
   state.startMs = Date.now();
@@ -3682,6 +3918,10 @@ function stopWalk() {
   document.getElementById('dist-display').textContent = '0.00';
   state.elapsed = 0; state.route = []; state.steps = 0; state.distance = 0;
   drawMap();
+  // 홈 패널로 복귀
+  document.getElementById('home-panel').classList.remove('hidden');
+  document.querySelector('.stats-overlay').classList.add('hidden');
+  renderHomePanel();
 }
 
 document.getElementById('btn-rec').addEventListener('click', toggleWalk);
@@ -3981,6 +4221,70 @@ function switchTab(tab) {
 /* ═══════════════════════════════
    HISTORY RENDER
 ═══════════════════════════════ */
+
+/* ═══════════════════════════════
+   HOME PANEL
+═══════════════════════════════ */
+let homeRecIdx = 0;
+const STREAK_DAYS = ['월','화','수','목','금','토','일'];
+const streakDone = [false, false, false, false, true, true, true]; // 목~일 체크 (프로토타입)
+const streakToday = 4; // 금요일 인덱스
+
+function renderHomePanel() {
+  // 인사
+  const h = new Date().getHours();
+  const greet = h < 5 ? '안녕히 주무셨나요 🌙' : h < 10 ? '좋은 아침이에요 👋' : h < 13 ? '활기찬 오전이에요 ☀️' : h < 17 ? '오후도 힘차게! 💪' : h < 20 ? '저녁 산책 어때요? 🌆' : '오늘 하루 수고했어요 🌙';
+  document.getElementById('home-hi').textContent = greet;
+  const now = new Date();
+  const days = ['일','월','화','수','목','금','토'];
+  document.getElementById('home-date').textContent = `${now.getMonth()+1}월 ${now.getDate()}일 ${days[now.getDay()]}요일`;
+
+  // 걸음 수
+  const steps = state.dailySteps;
+  const goal = state.dailyGoal;
+  const pct = Math.min(steps / goal, 1);
+  document.getElementById('home-step-num').textContent = steps.toLocaleString('ko-KR');
+  const remain = Math.max(goal - steps, 0);
+  document.getElementById('home-goal-remain').textContent =
+    remain > 0 ? `목표까지 ${remain.toLocaleString('ko-KR')}보 남았어요` : '오늘 목표 달성! 🎉';
+  // ring
+  const circ = 238.76;
+  document.getElementById('home-ring-fill').style.strokeDashoffset = circ * (1 - pct);
+
+  // 통계
+  const todayDist = (steps * 0.00075).toFixed(1);
+  const todayMin = Math.round(steps / 100);
+  const todayKcal = Math.round(steps * 0.06);
+  document.getElementById('home-stat-dist').textContent = todayDist + 'km';
+  document.getElementById('home-stat-time').textContent = todayMin + '분';
+  document.getElementById('home-stat-kcal').textContent = todayKcal + 'kcal';
+
+  // 스트릭
+  const weekEl = document.getElementById('home-streak-week');
+  weekEl.innerHTML = STREAK_DAYS.map((d,i) => {
+    const cls = streakDone[i] ? 'done' : i === streakToday ? 'today' : '';
+    return `<div class="home-streak-day ${cls}">${streakDone[i] ? '<span class="streak-check">✓</span>' : d}</div>`;
+  }).join('');
+
+  // 추천 코스
+  const rec = COURSES[homeRecIdx % COURSES.length];
+  if (rec) {
+    document.getElementById('home-rec-name').textContent = rec.name;
+    document.getElementById('home-rec-meta').textContent = `${rec.distance}km · ${rec.duration}분 · ${rec.area}`;
+    const tagsEl = document.getElementById('home-rec-tags');
+    tagsEl.innerHTML = (rec.tags || []).slice(0,3).map(t => `<span class="home-rec-tag">${t}</span>`).join('');
+    // 썸네일 그리기
+    requestAnimationFrame(() => {
+      const cv = document.getElementById('home-rec-canvas');
+      if (cv) {
+        const ctx = cv.getContext('2d');
+        const r = makeCourseGuideRoute(rec.routeShape, 72, 72);
+        drawRouteOnCtx(ctx, r, '#1a1c20', 2, 2);
+      }
+    });
+  }
+}
+
 function renderHistory() {
   // ── 저장한 코스 섹션 (myArchives)
   const savedSection = document.getElementById('archive-saved-section');
