@@ -251,7 +251,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 16px;
+  margin-bottom: 0;
   opacity: 0;
   transition: opacity 0.4s;
 }
@@ -301,7 +301,7 @@ body {
 }
 
 .stat-value.timer {
-  font-size: 56px;
+  font-size: 64px;
   font-weight: 700;
   letter-spacing: -0.05em;
 }
@@ -318,6 +318,72 @@ body {
   color: var(--ink-2);
   margin-top: 6px;
 }
+
+/* Recording UI — new layout */
+.rec-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 6px;
+}
+.pace-badge {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.pace-badge.visible { opacity: 1; }
+.pace-unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  margin-left: 1px;
+}
+.stat-timer {
+  width: 100%;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.stat-value-sm {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.walk-btn-row {
+  display: flex;
+  align-self: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+.pause-walk-btn {
+  height: 52px;
+  padding: 0 24px;
+  background: var(--surface, #fff);
+  color: var(--ink);
+  border: 1.5px solid rgba(0,0,0,0.12);
+  border-radius: 26px;
+  font: var(--B4); font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s;
+}
+.pause-walk-btn.paused {
+  background: var(--ink);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 20px rgba(26,28,32,0.28);
+}
+.pause-walk-btn.hidden { display: none; }
+.pause-walk-btn:active { opacity: 0.8; }
 
 .btn-wrap { display: flex; justify-content: center; }
 
@@ -2074,8 +2140,6 @@ body {
 .stats-overlay.hidden { display: none; }
 
 .stop-walk-fab {
-  align-self: center;
-  margin-top: 20px;
   height: 52px;
   padding: 0 28px;
   background: var(--neutral-1000);
@@ -2442,30 +2506,46 @@ body {
           </button>
         </div>
 
-        <div class="rec-badge" id="rec-badge">
-          <div class="rec-dot"></div>
-          <span class="rec-label">기록 중</span>
+        <div class="rec-status-row">
+          <div class="rec-badge" id="rec-badge">
+            <div class="rec-dot"></div>
+            <span class="rec-label">기록 중</span>
+          </div>
+          <div class="rec-badge" id="rec-badge-paused" style="display:none;opacity:1">
+            <span class="rec-label" style="color:#8a8d91;text-transform:none;letter-spacing:0">일시정지</span>
+          </div>
+          <div class="pace-badge" id="pace-badge">--'--"<span class="pace-unit">/km</span></div>
+        </div>
+        <div class="stat-timer">
+          <div class="stat-value timer" id="timer-display">00:00</div>
         </div>
         <div class="stats-row">
           <div class="stat-item">
-            <div class="stat-value timer" id="timer-display">00:00</div>
-            <div class="stat-label">시간</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value" id="dist-display">0.00</div>
+            <div class="stat-value-sm" id="dist-display">0.00</div>
             <div class="stat-unit">km</div>
             <div class="stat-label">거리</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value" id="steps-display">0</div>
+            <div class="stat-value-sm" id="steps-display">0</div>
             <div class="stat-unit">보</div>
             <div class="stat-label">걸음</div>
           </div>
+          <div class="stat-item">
+            <div class="stat-value-sm" id="kcal-display">0</div>
+            <div class="stat-unit">kcal</div>
+            <div class="stat-label">칼로리</div>
+          </div>
         </div>
-        <button class="stop-walk-fab hidden" id="stop-walk-fab" onclick="stopWalk()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg>
-          그만하기
-        </button>
+        <div class="walk-btn-row">
+          <button class="pause-walk-btn hidden" id="pause-walk-btn" onclick="togglePause()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" id="pause-icon"><rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/></svg>
+            <span id="pause-label">일시정지</span>
+          </button>
+          <button class="stop-walk-fab hidden" id="stop-walk-fab" onclick="stopWalk()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg>
+            그만하기
+          </button>
+        </div>
       </div>
     </div>
 
@@ -2849,10 +2929,11 @@ function onMotion(e) {
       pedo.lastPeak = now;
       pedo.totalSteps++;
       pedo.sessionSteps++;
-      if (state.isWalking) {
+      if (state.isWalking && !state.isPaused) {
         state.steps = pedo.sessionSteps;
         document.getElementById('steps-display').textContent =
           state.steps.toLocaleString('ko-KR');
+        document.getElementById('kcal-display').textContent = Math.round(state.steps * 0.04);
       }
       updatePedoUI();
     }
@@ -3317,6 +3398,7 @@ let activeCourse = null;
 const state = {
   tab: 'record',
   isWalking: false,
+  isPaused: false,
   startMs: null,
   elapsed: 0,
   steps: 0,
@@ -3423,15 +3505,18 @@ function haversine(lat1, lng1, lat2, lng2) {
 }
 
 function addRoutePoint(lat, lng) {
+  if (state.isPaused) return;
   if (state.route.length > 0) {
     const prev = state.route[state.route.length - 1];
     const dist = haversine(prev.lat, prev.lng, lat, lng);
     if (dist < 3 && !usingSimulation) return; // 3m 미만 GPS 노이즈 필터
     state.distance += dist / 1000;
     document.getElementById('dist-display').textContent = state.distance.toFixed(2);
-    // 이동 거리 기반 걸음 수 (평균 보폭 0.78m)
-    state.steps = Math.round(state.distance * 1000 / 0.78);
-    document.getElementById('steps-display').textContent = state.steps.toLocaleString('ko-KR');
+    if (!pedo.sensorActive) {
+      state.steps = Math.round(state.distance * 1000 / 0.78);
+      document.getElementById('steps-display').textContent = state.steps.toLocaleString('ko-KR');
+    }
+    document.getElementById('kcal-display').textContent = Math.round(state.steps * 0.04);
   }
   state.route.push({ lat, lng });
   if (!leafletMap) return;
@@ -3848,10 +3933,17 @@ function formatTime(totalSeconds) {
 }
 
 function tick() {
-  if (!state.isWalking) return;
+  if (!state.isWalking || state.isPaused) return;
   const elapsed = (Date.now() - state.startMs + state.elapsed) / 1000;
   document.getElementById('timer-display').textContent = formatTime(elapsed);
-  // 걸음 수·거리는 이동 감지 시 addRoutePoint()에서 업데이트
+  if (state.distance >= 0.05) {
+    const paceSecKm = elapsed / state.distance;
+    const m = Math.floor(paceSecKm / 60);
+    const s = Math.floor(paceSecKm % 60);
+    document.getElementById('pace-badge').innerHTML =
+      `${m}'${String(s).padStart(2,'0')}"<span class="pace-unit">/km</span>`;
+    document.getElementById('pace-badge').classList.add('visible');
+  }
   state.animFrame = requestAnimationFrame(tick);
 }
 
@@ -3881,30 +3973,44 @@ function startRecCourse() {
 
 function startWalk() {
   state.isWalking = true;
+  state.isPaused = false;
   state.startMs = Date.now();
+  state.elapsed = 0;
   state.steps = 0; state.distance = 0; state.route = [];
   pedo.sessionSteps = 0;
-  // 서비스 제공 코스를 따라가는 경우 true
   state.followingServiceCourse = !!(activeCourse && COURSES.some(c => c.id === activeCourse.id));
 
   document.getElementById('rec-badge').classList.add('visible');
+  document.getElementById('rec-badge-paused').style.display = 'none';
+  document.getElementById('pace-badge').classList.remove('visible');
+  document.getElementById('pace-badge').innerHTML = `--'--"<span class="pace-unit">/km</span>`;
   document.getElementById('stop-walk-fab').classList.remove('hidden');
+  document.getElementById('pause-walk-btn').classList.remove('hidden');
+  document.getElementById('pause-walk-btn').classList.remove('paused');
+  document.getElementById('pause-label').textContent = '일시정지';
+  document.getElementById('pause-icon').innerHTML = '<rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/>';
   document.getElementById('report-fab').classList.add('hidden');
   document.getElementById('nav').style.opacity = '0';
   document.getElementById('nav').style.pointerEvents = 'none';
 
+  requestWakeLock();
   tick();
   startGeoTracking();
 }
 
 function stopWalk() {
+  if (state.isPaused) state.isPaused = false;
   const elapsed = (Date.now() - state.startMs + state.elapsed) / 1000;
   state.isWalking = false;
   cancelAnimationFrame(state.animFrame);
   stopGeoTracking();
+  releaseWakeLock();
 
   document.getElementById('rec-badge').classList.remove('visible');
+  document.getElementById('rec-badge-paused').style.display = 'none';
   document.getElementById('stop-walk-fab').classList.add('hidden');
+  document.getElementById('pause-walk-btn').classList.add('hidden');
+  document.getElementById('pace-badge').classList.remove('visible');
   document.getElementById('nav').style.opacity = '1';
   document.getElementById('nav').style.pointerEvents = '';
   if (state.tab === 'history') document.getElementById('report-fab').classList.remove('hidden');
@@ -3941,6 +4047,8 @@ function stopWalk() {
   document.getElementById('timer-display').textContent = '00:00';
   document.getElementById('steps-display').textContent = '0';
   document.getElementById('dist-display').textContent = '0.00';
+  document.getElementById('kcal-display').textContent = '0';
+  document.getElementById('pace-badge').innerHTML = `--'--"<span class="pace-unit">/km</span>`;
   state.elapsed = 0; state.route = []; state.steps = 0; state.distance = 0;
   drawMap();
   // 홈 패널로 복귀
@@ -3949,6 +4057,45 @@ function stopWalk() {
   renderHomePanel();
 }
 
+
+function togglePause() {
+  if (!state.isWalking) return;
+  if (state.isPaused) {
+    // Resume
+    state.isPaused = false;
+    state.startMs = Date.now();
+    cancelAnimationFrame(state.animFrame);
+    document.getElementById('rec-badge').classList.add('visible');
+    document.getElementById('rec-badge-paused').style.display = 'none';
+    document.getElementById('pause-walk-btn').classList.remove('paused');
+    document.getElementById('pause-label').textContent = '일시정지';
+    document.getElementById('pause-icon').innerHTML =
+      '<rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/>';
+    startGeoTracking();
+    tick();
+  } else {
+    // Pause
+    state.elapsed += Date.now() - state.startMs;
+    state.isPaused = true;
+    cancelAnimationFrame(state.animFrame);
+    stopGeoTracking();
+    document.getElementById('rec-badge').classList.remove('visible');
+    document.getElementById('rec-badge-paused').style.display = 'flex';
+    document.getElementById('pause-walk-btn').classList.add('paused');
+    document.getElementById('pause-label').textContent = '계속 걷기';
+    document.getElementById('pause-icon').innerHTML =
+      '<path d="M8 5.14v14l11-7-11-7z"/>';
+  }
+}
+
+let wakeLock = null;
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch {}
+}
+function releaseWakeLock() {
+  if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+}
 
 /* ═══════════════════════════════
    ARCHIVE — SAVE ROUTE
