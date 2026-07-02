@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>산책</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -172,7 +174,9 @@ body {
 #tab-record { position: absolute; inset: 0; }
 
 #map-wrap { position: absolute; inset: 0; }
-#map-canvas { width: 100%; height: 100%; display: block; }
+#map { width: 100%; height: 100%; }
+#map .leaflet-control-attribution { display: none; }
+#map .leaflet-control-zoom { display: none; }
 
 .stats-overlay {
   position: absolute;
@@ -2329,7 +2333,7 @@ body {
     <!-- ── RECORD TAB ── -->
     <div class="tab-panel active" id="tab-record">
       <div id="map-wrap">
-        <canvas id="map-canvas"></canvas>
+        <div id="map"></div>
       </div>
 
       <!-- 숨김 처리된 만보기 DOM (updatePedoUI 참조용) -->
@@ -3369,57 +3373,118 @@ function makeDemoRoute(cx, cy, rx, ry, pts) {
 }
 
 /* ═══════════════════════════════
-   MAP CANVAS
+   LEAFLET MAP + GPS TRACKING
 ═══════════════════════════════ */
-const mapCanvas = document.getElementById('map-canvas');
-const mapCtx = mapCanvas.getContext('2d');
-let mapW, mapH, dpr;
 
-function initCanvas() {
-  dpr = window.devicePixelRatio || 1;
-  const rect = mapCanvas.parentElement.getBoundingClientRect();
-  mapW = rect.width;
-  mapH = rect.height;
-  mapCanvas.width = mapW * dpr;
-  mapCanvas.height = mapH * dpr;
-  mapCtx.scale(dpr, dpr);
-  drawMap();
+// Real GPS coordinates for Seoul walking courses
+const COURSE_GPS_ROUTES = {
+  hangang:       [[37.5099,126.9899],[37.5090,126.9942],[37.5084,126.9985],[37.5080,127.0028],[37.5078,127.0071],[37.5082,127.0114],[37.5089,127.0157],[37.5098,127.0200]],
+  cheonggyecheon:[[37.5697,126.9791],[37.5694,126.9831],[37.5692,126.9871],[37.5690,126.9911],[37.5688,126.9951],[37.5686,126.9991],[37.5684,127.0031]],
+  anyangcheon:   [[37.5268,126.8695],[37.5238,126.8708],[37.5208,126.8721],[37.5178,126.8734],[37.5148,126.8747],[37.5118,126.8760],[37.5148,126.8747],[37.5178,126.8734]],
+  namsan:        [[37.5512,126.9882],[37.5529,126.9918],[37.5537,126.9958],[37.5526,126.9996],[37.5505,127.0008],[37.5484,126.9988],[37.5475,126.9952],[37.5484,126.9916],[37.5501,126.9893],[37.5512,126.9882]],
+  morning:       [[37.5268,126.8795],[37.5275,126.8840],[37.5270,126.8885],[37.5263,126.8930],[37.5258,126.8975],[37.5263,126.9020],[37.5270,126.9065]],
+  neighborhood:  [[37.5665,126.9780],[37.5673,126.9815],[37.5681,126.9850],[37.5675,126.9882],[37.5663,126.9900],[37.5651,126.9878],[37.5646,126.9845],[37.5655,126.9812],[37.5665,126.9780]]
+};
+
+let leafletMap = null;
+let routePolyline = null;
+let courseGuidePolyline = null;
+let userMarker = null;
+let geoWatchId = null;
+let simInterval = null;
+let usingSimulation = false;
+
+function initMap() {
+  leafletMap = L.map('map', { center: [37.5665, 126.9780], zoom: 16, zoomControl: false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(leafletMap);
+  routePolyline = L.polyline([], { color: '#1A1C20', weight: 5, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }).addTo(leafletMap);
+  courseGuidePolyline = L.polyline([], { color: '#1A1C20', weight: 3, opacity: 0.4, dashArray: '8,10' }).addTo(leafletMap);
+  updateCourseGuide();
 }
 
-function drawMapBg(ctx, W, H) {
-  ctx.fillStyle = '#E2E4E2';
-  ctx.fillRect(0, 0, W, H);
+function updateCourseGuide() {
+  if (!leafletMap || !courseGuidePolyline) return;
+  if (activeCourse && COURSE_GPS_ROUTES[activeCourse.id]) {
+    courseGuidePolyline.setLatLngs(COURSE_GPS_ROUTES[activeCourse.id]);
+    leafletMap.fitBounds(courseGuidePolyline.getBounds(), { padding: [60, 60] });
+  } else {
+    courseGuidePolyline.setLatLngs([]);
+  }
+}
 
-  ctx.fillStyle = '#D4D7D4';
-  const blockRects = [
-    [0, 0, W*0.26, H*0.32], [W*0.32, 0, W*0.28, H*0.32], [W*0.68, 0, W*0.32, H*0.32],
-    [0, H*0.38, W*0.26, H*0.28], [W*0.32, H*0.38, W*0.28, H*0.28], [W*0.68, H*0.38, W*0.32, H*0.28],
-    [0, H*0.72, W*0.44, H*0.28], [W*0.54, H*0.72, W*0.46, H*0.28],
-  ];
-  blockRects.forEach(([x,y,w,h]) => ctx.fillRect(x, y, w, h));
+function drawMap() { updateCourseGuide(); }
 
-  const parkGrad = ctx.createLinearGradient(W*0.32, H*0.38, W*0.6, H*0.66);
-  parkGrad.addColorStop(0, '#C8CEC8');
-  parkGrad.addColorStop(1, '#BCC4BC');
-  ctx.fillStyle = parkGrad;
-  ctx.fillRect(W*0.32, H*0.38, W*0.28, H*0.28);
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const φ1 = lat1 * Math.PI / 180, φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180, Δλ = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(Δφ/2)**2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
-  ctx.fillStyle = '#ADBCAD';
-  [[W*0.39,H*0.44],[W*0.46,H*0.48],[W*0.42,H*0.55],[W*0.52,H*0.44],[W*0.55,H*0.52],[W*0.49,H*0.58]].forEach(([tx,ty]) => {
-    ctx.beginPath(); ctx.arc(tx, ty, 8, 0, Math.PI*2); ctx.fill();
-  });
+function addRoutePoint(lat, lng) {
+  if (state.route.length > 0) {
+    const prev = state.route[state.route.length - 1];
+    const dist = haversine(prev.lat, prev.lng, lat, lng);
+    if (dist < 3 && !usingSimulation) return; // 3m 미만 GPS 노이즈 필터
+    state.distance += dist / 1000;
+    document.getElementById('dist-display').textContent = state.distance.toFixed(2);
+  }
+  state.route.push({ lat, lng });
+  if (!leafletMap) return;
+  routePolyline.setLatLngs(state.route.map(p => [p.lat, p.lng]));
+  if (!userMarker) {
+    userMarker = L.circleMarker([lat, lng], { radius: 9, fillColor: '#1A1C20', color: '#fff', weight: 3, fillOpacity: 1 }).addTo(leafletMap);
+  } else {
+    userMarker.setLatLng([lat, lng]);
+  }
+  leafletMap.panTo([lat, lng], { animate: true, duration: 0.6 });
+}
 
-  ctx.fillStyle = '#F0F2F0';
-  [H*0.32, H*0.66].forEach(ry => ctx.fillRect(0, ry, W, H*0.06));
-  [W*0.26, W*0.60].forEach(rx => ctx.fillRect(rx, 0, W*0.06, H));
+function startGeoTracking() {
+  if (routePolyline) routePolyline.setLatLngs([]);
+  if (userMarker) { userMarker.remove(); userMarker = null; }
 
-  ctx.save();
-  ctx.setLineDash([12, 10]);
-  ctx.strokeStyle = '#E0E3E0';
-  ctx.lineWidth = 1;
-  [H*0.32+H*0.03, H*0.66+H*0.03].forEach(ry => { ctx.beginPath(); ctx.moveTo(0,ry); ctx.lineTo(W,ry); ctx.stroke(); });
-  [W*0.26+W*0.03, W*0.60+W*0.03].forEach(rx => { ctx.beginPath(); ctx.moveTo(rx,0); ctx.lineTo(rx,H); ctx.stroke(); });
-  ctx.restore();
+  if (activeCourse && COURSE_GPS_ROUTES[activeCourse.id]) {
+    leafletMap.setView(COURSE_GPS_ROUTES[activeCourse.id][0], 16);
+  }
+
+  if (!navigator.geolocation) { _startSimFallback(); return; }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 17);
+      usingSimulation = false;
+      geoWatchId = navigator.geolocation.watchPosition(
+        (p) => { if (state.isWalking) addRoutePoint(p.coords.latitude, p.coords.longitude); },
+        () => { if (!simInterval) _startSimFallback(); },
+        { enableHighAccuracy: true, maximumAge: 3000, timeout: 8000 }
+      );
+    },
+    () => _startSimFallback(),
+    { enableHighAccuracy: true, timeout: 5000 }
+  );
+}
+
+function _startSimFallback() {
+  usingSimulation = true;
+  const center = (activeCourse && COURSE_GPS_ROUTES[activeCourse.id])
+    ? COURSE_GPS_ROUTES[activeCourse.id][0]
+    : [37.5665, 126.9780];
+  if (state.route.length === 0) addRoutePoint(center[0], center[1]);
+  leafletMap.setView(center, 16);
+  let angle = Math.random() * Math.PI * 2;
+  simInterval = setInterval(() => {
+    if (!state.isWalking) return;
+    angle += (Math.random() - 0.5) * 0.45;
+    const last = state.route[state.route.length - 1];
+    addRoutePoint(last.lat + Math.cos(angle) * 0.000055, last.lng + Math.sin(angle) * 0.000075);
+  }, 800);
+}
+
+function stopGeoTracking() {
+  if (geoWatchId != null) { navigator.geolocation.clearWatch(geoWatchId); geoWatchId = null; }
+  if (simInterval) { clearInterval(simInterval); simInterval = null; }
+  usingSimulation = false;
 }
 
 function drawRouteOnCtx(ctx, route, color, lineWidth, dotRadius) {
@@ -3516,54 +3581,6 @@ function makeCourseGuideRoute(shape, W, H) {
 function makeGeoGuideRoute(geoData, W, H) {
   if (!geoData || !geoData.trail || geoData.trail.length < 2) return [];
   return geoToCanvasRoute(geoData.trail, geoData.bbox, W, H);
-}
-
-function drawMap() {
-  mapCtx.clearRect(0, 0, mapW, mapH);
-  drawMapBg(mapCtx, mapW, mapH);
-
-  // Draw ghost course guide if active course set
-  if (activeCourse) {
-    let guide;
-    if (activeCourse._savedRoute) {
-      const r = activeCourse._savedRoute;
-      let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-      r.forEach(p=>{minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);});
-      const rw=maxX-minX||1, rh=maxY-minY||1;
-      const sc=Math.min((mapW*0.7)/rw,(mapH*0.6)/rh);
-      const ox=(mapW-rw*sc)/2, oy=mapH*0.2;
-      guide = r.map(p=>({x:ox+(p.x-minX)*sc, y:oy+(p.y-minY)*sc}));
-    } else {
-      if (activeCourse.routeShape === 'geo' && activeCourse.geoData) {
-        guide = makeGeoGuideRoute(activeCourse.geoData, mapW, mapH);
-      } else {
-        guide = makeCourseGuideRoute(activeCourse.routeShape, mapW, mapH);
-      }
-    }
-    mapCtx.save();
-    mapCtx.setLineDash([8, 8]);
-    mapCtx.globalAlpha = 0.35;
-    drawRouteOnCtx(mapCtx, guide, '#1A1C20', 4, 0);
-    mapCtx.setLineDash([]);
-    mapCtx.globalAlpha = 1;
-    if (guide.length > 0) {
-      const sp = guide[0];
-      mapCtx.beginPath();
-      mapCtx.fillStyle = '#1A1C20';
-      mapCtx.arc(sp.x, sp.y, 7, 0, Math.PI*2);
-      mapCtx.fill();
-      mapCtx.fillStyle = 'white';
-      mapCtx.beginPath();
-      mapCtx.arc(sp.x, sp.y, 3.5, 0, Math.PI*2);
-      mapCtx.fill();
-    }
-    mapCtx.restore();
-  }
-
-  if (state.route.length >= 2) {
-    drawRouteOnCtx(mapCtx, state.route, 'rgba(26,28,32,0.1)', 10, 0);
-    drawRouteOnCtx(mapCtx, state.route, '#1A1C20', 4, 7);
-  }
 }
 
 /* ═══════════════════════════════
@@ -3797,12 +3814,17 @@ function drawThumb(canvas, route) {
 
   if (!route || route.length < 2) return;
 
+  // {lat,lng} → {x,y} 변환 (lat은 위로 갈수록 커지므로 y축 반전)
+  const pts = route[0].lat !== undefined
+    ? route.map(p => ({ x: p.lng, y: -p.lat }))
+    : route;
+
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-  route.forEach(p => { minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y); });
+  pts.forEach(p => { minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y); });
   const rw=maxX-minX||1, rh=maxY-minY||1;
   const scale=Math.min(44/rw,44/rh);
   const ox=(62-rw*scale)/2, oy=(62-rh*scale)/2;
-  const scaled=route.map(p=>({x:ox+(p.x-minX)*scale,y:oy+(p.y-minY)*scale}));
+  const scaled=pts.map(p=>({x:ox+(p.x-minX)*scale,y:oy+(p.y-minY)*scale}));
 
   ctx.beginPath(); ctx.strokeStyle='#3E9158'; ctx.lineWidth=2;
   ctx.lineCap='round'; ctx.lineJoin='round';
@@ -3827,50 +3849,9 @@ function tick() {
   const elapsed = (Date.now() - state.startMs + state.elapsed) / 1000;
   document.getElementById('timer-display').textContent = formatTime(elapsed);
   state.steps = Math.floor(elapsed * 2.1);
-  state.distance = elapsed * 0.0013;
   document.getElementById('steps-display').textContent = state.steps.toLocaleString('ko-KR');
-  document.getElementById('dist-display').textContent = state.distance.toFixed(2);
+  // 거리는 GPS/시뮬레이션의 addRoutePoint()에서 실시간 업데이트
   state.animFrame = requestAnimationFrame(tick);
-}
-
-/* ═══════════════════════════════
-   ROUTE SIMULATION
-═══════════════════════════════ */
-function startRouteSimulation() {
-  const startX = mapW * 0.44;
-  const startY = mapH * 0.80;
-  if (state.route.length === 0) state.route.push({x: startX, y: startY});
-
-  let angle = -Math.PI / 2;
-  const speed = 3;
-
-  state.routeInterval = setInterval(() => {
-    if (!state.isWalking) return;
-    const last = state.route[state.route.length - 1];
-    const target = getCircuitAngle(last, mapW, mapH);
-    const diff = target - angle;
-    const normDiff = ((diff + Math.PI) % (Math.PI * 2)) - Math.PI;
-    angle += normDiff * 0.12 + (Math.random() - 0.5) * 0.15;
-
-    const newX = last.x + Math.cos(angle) * speed;
-    const newY = last.y + Math.sin(angle) * speed;
-    state.route.push({
-      x: Math.max(20, Math.min(mapW-20, newX)),
-      y: Math.max(20, Math.min(mapH-20, newY))
-    });
-    drawMap();
-  }, 400);
-}
-
-function getCircuitAngle(pos, W, H) {
-  const cx = W * 0.48, cy = H * 0.50;
-  const dx = cx - pos.x, dy = cy - pos.y;
-  return Math.atan2(dx, -dy);
-}
-
-function stopRouteSimulation() {
-  clearInterval(state.routeInterval);
-  state.routeInterval = null;
 }
 
 /* ═══════════════════════════════
@@ -3912,14 +3893,14 @@ function startWalk() {
   document.getElementById('nav').style.pointerEvents = 'none';
 
   tick();
-  startRouteSimulation();
+  startGeoTracking();
 }
 
 function stopWalk() {
   const elapsed = (Date.now() - state.startMs + state.elapsed) / 1000;
   state.isWalking = false;
   cancelAnimationFrame(state.animFrame);
-  stopRouteSimulation();
+  stopGeoTracking();
 
   document.getElementById('rec-badge').classList.remove('visible');
   document.getElementById('stop-walk-fab').classList.add('hidden');
@@ -4463,7 +4444,7 @@ function updateClock() {
    INIT
 ═══════════════════════════════ */
 window.addEventListener('load', () => {
-  initCanvas();
+  initMap();
   renderHistory();
   updateGoals();
   renderFilters();
@@ -4607,7 +4588,7 @@ function submitReport() {
   showToast('제보해주셔서 감사해요! 검토 후 등록됩니다 🙏');
 }
 
-window.addEventListener('resize', initCanvas);
+window.addEventListener('resize', () => leafletMap && leafletMap.invalidateSize());
 </script>
 </body>
 </html>
