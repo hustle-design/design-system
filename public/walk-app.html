@@ -174,6 +174,25 @@ body {
 
 #map-wrap { position: absolute; inset: 0; z-index: 0; }
 #map { width: 100%; height: 100%; }
+
+.locate-btn {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--surface, #fff);
+  border: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.16);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink);
+  cursor: pointer;
+  z-index: 5;
+  transition: color 0.2s, transform 0.15s;
+}
+.locate-btn:active { transform: scale(0.92); }
+.locate-btn.active { color: #1a73e8; }
+.locate-btn.loading { opacity: 0.5; }
 #map .naver-control-zoom { display: none; }
 
 .stats-overlay {
@@ -2396,6 +2415,12 @@ body {
     <div class="tab-panel active" id="tab-record">
       <div id="map-wrap">
         <div id="map"></div>
+        <button class="locate-btn" id="locate-btn" onclick="centerOnMyLocation()" aria-label="내 위치로 이동">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+          </svg>
+        </button>
       </div>
 
       <!-- 숨김 처리된 만보기 DOM (updatePedoUI 참조용) -->
@@ -3501,6 +3526,33 @@ function initMap() {
     strokeStyle: 'dash',
   });
   updateCourseGuide();
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        leafletMap.setCenter(new naver.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+        leafletMap.setZoom(15);
+      },
+      () => {},
+      { enableHighAccuracy: false, timeout: 5000 }
+    );
+  }
+}
+
+function centerOnMyLocation() {
+  if (!navigator.geolocation || !leafletMap) return;
+  const btn = document.getElementById('locate-btn');
+  btn.classList.add('loading');
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      leafletMap.setCenter(new naver.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+      leafletMap.setZoom(17);
+      btn.classList.remove('loading');
+      btn.classList.add('active');
+    },
+    () => { btn.classList.remove('loading'); },
+    { enableHighAccuracy: true, timeout: 5000 }
+  );
 }
 
 function _getNaverBounds(coords) {
@@ -3536,12 +3588,16 @@ function haversine(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function addRoutePoint(lat, lng) {
+function addRoutePoint(lat, lng, accuracy) {
   if (state.isPaused) return;
+  // 정확도가 너무 낮은(50m 초과) GPS fix는 앵커를 오염시키므로 아예 무시
+  if (!usingSimulation && accuracy != null && accuracy > 50) return;
   if (state.route.length > 0) {
     const prev = state.route[state.route.length - 1];
     const dist = haversine(prev.lat, prev.lng, lat, lng);
-    if (dist < 3 && !usingSimulation) return; // 3m 미만 GPS 노이즈 필터
+    // 제자리에서도 GPS는 수~수십 m씩 흔들리므로, 정확도에 비례한 노이즈 필터 적용
+    const noiseThreshold = usingSimulation ? 0 : Math.min(30, Math.max(8, (accuracy || 15) * 1.5));
+    if (dist < noiseThreshold) return;
     state.distance += dist / 1000;
     document.getElementById('dist-display').textContent = state.distance.toFixed(2);
     if (!pedo.sensorActive) {
@@ -3585,7 +3641,7 @@ function startGeoTracking() {
       leafletMap.setZoom(17);
       usingSimulation = false;
       geoWatchId = navigator.geolocation.watchPosition(
-        (p) => { if (state.isWalking) addRoutePoint(p.coords.latitude, p.coords.longitude); },
+        (p) => { if (state.isWalking) addRoutePoint(p.coords.latitude, p.coords.longitude, p.coords.accuracy); },
         () => { if (!simInterval) _startSimFallback(); },
         { enableHighAccuracy: true, maximumAge: 3000, timeout: 8000 }
       );
@@ -4064,7 +4120,7 @@ function stopWalk() {
     updatePedoUI();
   }
 
-  if (elapsed > 10 && state.route.length > 2) {
+  if (elapsed > 10 && state.route.length > 2 && state.distance >= 0.03) {
     const now = new Date();
     const entry = {
       id: Date.now(),
