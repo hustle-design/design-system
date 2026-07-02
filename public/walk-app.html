@@ -3429,6 +3429,9 @@ function addRoutePoint(lat, lng) {
     if (dist < 3 && !usingSimulation) return; // 3m 미만 GPS 노이즈 필터
     state.distance += dist / 1000;
     document.getElementById('dist-display').textContent = state.distance.toFixed(2);
+    // 이동 거리 기반 걸음 수 (평균 보폭 0.78m)
+    state.steps = Math.round(state.distance * 1000 / 0.78);
+    document.getElementById('steps-display').textContent = state.steps.toLocaleString('ko-KR');
   }
   state.route.push({ lat, lng });
   if (!leafletMap) return;
@@ -3848,9 +3851,7 @@ function tick() {
   if (!state.isWalking) return;
   const elapsed = (Date.now() - state.startMs + state.elapsed) / 1000;
   document.getElementById('timer-display').textContent = formatTime(elapsed);
-  state.steps = Math.floor(elapsed * 2.1);
-  document.getElementById('steps-display').textContent = state.steps.toLocaleString('ko-KR');
-  // 거리는 GPS/시뮬레이션의 addRoutePoint()에서 실시간 업데이트
+  // 걸음 수·거리는 이동 감지 시 addRoutePoint()에서 업데이트
   state.animFrame = requestAnimationFrame(tick);
 }
 
