@@ -1101,31 +1101,66 @@ body {
   text-transform: uppercase;
 }
 
-.archive-photo-row {
-  display: flex;
-  gap: 8px;
-  padding: 0 20px 4px;
+/* 사진 캘린더 */
+.archive-calendar {
+  padding: 4px 20px 12px;
 }
-.archive-photo-card {
-  flex: 1;
+.cal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 4px;
+}
+.cal-month-label { font: var(--B3); font-weight: 700; color: var(--ink); }
+.cal-nav-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none; background: var(--neutral-100);
+  color: var(--ink); font-size: 16px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.cal-nav-btn:active { background: var(--neutral-200); }
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 4px 0;
+}
+.cal-weekdays span {
+  text-align: center;
+  font: var(--C1); font-weight: 700; color: var(--ink-3);
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-cell {
+  position: relative;
   aspect-ratio: 1;
-  border-radius: var(--r-lg);
-  background-color: var(--neutral-200);
+  border-radius: var(--r-md);
+  background-color: var(--neutral-100);
   background-size: cover;
   background-position: center;
-  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
   overflow: hidden;
 }
-.archive-photo-badge {
-  position: absolute;
-  left: 8px; bottom: 8px;
-  background: rgba(0,0,0,0.55);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 99px;
+.cal-cell.empty { background: none; }
+.cal-cell.today { box-shadow: inset 0 0 0 2px var(--ink); }
+.cal-cell.has-photo::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 55%);
 }
+.cal-day-num {
+  position: relative;
+  z-index: 1;
+  font: var(--C2); font-weight: 600;
+  color: var(--ink-2);
+  padding: 4px 6px;
+}
+.cal-cell.has-photo .cal-day-num { color: #fff; font-weight: 700; }
+
 .archive-saved-card { border-bottom: 1px solid var(--neutral-200); }
 .archive-report-btn {
   flex-shrink: 0;
@@ -2915,26 +2950,6 @@ body {
           <div class="week-bars" id="week-bars"></div>
         </div>
       </div>
-      <div class="goal-card">
-        <div class="goal-card-head">
-          <div class="goal-card-title">주간 목표</div>
-          <button class="goal-edit-btn">수정</button>
-        </div>
-        <div class="ring-row">
-          <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
-            <circle cx="45" cy="45" r="38" fill="none" stroke="#EBEBEC" stroke-width="9"/>
-            <circle cx="45" cy="45" r="38" fill="none" stroke="#1A1C20" stroke-width="9"
-              stroke-linecap="round" stroke-dasharray="238.76"
-              id="weekly-ring" stroke-dashoffset="91.7"
-              transform="rotate(-90 45 45)"/>
-          </svg>
-          <div class="ring-info">
-            <div class="ring-count">18,651 <span class="unit">보</span></div>
-            <div class="ring-goal-text">목표 30,000보 · 5일 남음</div>
-            <div class="ring-chip amber">62%</div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- ── HISTORY TAB ── -->
@@ -2943,10 +2958,17 @@ body {
         <h1>아카이브</h1>
         <p>내가 걸은 길 <span id="total-walks">3</span>개</p>
       </div>
-      <!-- 산책 중 찍은 사진 (최근 3개) -->
-      <div id="archive-photo-strip" style="display:none">
-        <div class="archive-section-label">최근 사진</div>
-        <div class="archive-photo-row" id="archive-photo-row"></div>
+      <!-- 산책 중 찍은 사진 캘린더 -->
+      <div class="archive-calendar" id="archive-calendar">
+        <div class="cal-header">
+          <button class="cal-nav-btn" onclick="calShiftMonth(-1)" aria-label="이전 달">‹</button>
+          <div class="cal-month-label" id="cal-month-label">—</div>
+          <button class="cal-nav-btn" onclick="calShiftMonth(1)" aria-label="다음 달">›</button>
+        </div>
+        <div class="cal-weekdays">
+          <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
       </div>
       <!-- 저장된 코스 (제보 가능) -->
       <div id="archive-saved-section" style="display:none">
@@ -3890,8 +3912,6 @@ const state = {
   ],
   dailySteps: 3124,
   dailyGoal: 6000,
-  weeklySteps: 18651,
-  weeklyGoal: 30000,
   homeDong: '',
   workDong: '',
   homeCoord: null,
@@ -5127,21 +5147,62 @@ function renderHomePanel() {
   }
 }
 
-function renderHistory() {
-  // ── 산책 중 찍은 사진 (최근 3개)
-  const photoStrip = document.getElementById('archive-photo-strip');
-  const photoRow = document.getElementById('archive-photo-row');
-  const withPhotos = state.history.filter(h => h.photos && h.photos.length > 0).slice(0, 3);
-  if (withPhotos.length > 0) {
-    photoStrip.style.display = 'block';
-    photoRow.innerHTML = withPhotos.map(h => `
-      <div class="archive-photo-card" style="background-image:url('${h.photos[0].dataUrl}')">
-        <span class="archive-photo-badge">${h.distance.toFixed(1)}km</span>
-      </div>
-    `).join('');
-  } else {
-    photoStrip.style.display = 'none';
+/* ═══════════════════════════════
+   아카이브 — 사진 캘린더
+═══════════════════════════════ */
+let calYear = null, calMonth = null; // calMonth: 0-indexed
+
+function calShiftMonth(delta) {
+  if (calYear === null) return;
+  calMonth += delta;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function getEntryDate(h) {
+  return new Date(h.id); // 실제 기록은 id가 Date.now() 값이라 실제 촬영 날짜로 환산 가능
+}
+
+function renderCalendar() {
+  if (calYear === null) {
+    const now = new Date();
+    calYear = now.getFullYear();
+    calMonth = now.getMonth();
   }
+  document.getElementById('cal-month-label').textContent = `${calYear}년 ${calMonth + 1}월`;
+
+  const photoByDay = {};
+  state.history.forEach(h => {
+    if (!h.photos || !h.photos.length) return;
+    const d = getEntryDate(h);
+    if (d.getFullYear() === calYear && d.getMonth() === calMonth) {
+      photoByDay[d.getDate()] = h.photos[0].dataUrl;
+    }
+  });
+
+  const firstDow = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear() === calYear && today.getMonth() === calMonth;
+
+  let cells = '';
+  for (let i = 0; i < firstDow; i++) cells += '<div class="cal-cell empty"></div>';
+  for (let day = 1; day <= daysInMonth; day++) {
+    const photo = photoByDay[day];
+    const isToday = isCurrentMonth && today.getDate() === day;
+    cells += `
+      <div class="cal-cell${photo ? ' has-photo' : ''}${isToday ? ' today' : ''}"${photo ? ` style="background-image:url('${photo}')"` : ''}>
+        <span class="cal-day-num">${day}</span>
+      </div>
+    `;
+  }
+  document.getElementById('cal-grid').innerHTML = cells;
+}
+
+function renderHistory() {
+  // ── 산책 중 찍은 사진 캘린더
+  renderCalendar();
 
   // ── 저장한 코스 섹션 (myArchives)
   const savedSection = document.getElementById('archive-saved-section');
