@@ -2067,6 +2067,33 @@ body {
 
 .ob-theme-card.selected .ob-theme-desc { color: var(--accent); }
 
+.ob-dong-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ob-dong-field { display: flex; flex-direction: column; }
+
+.ob-dong-label {
+  font: var(--B5);
+  font-weight: 700;
+  color: var(--neutral-900);
+  margin-bottom: 8px;
+}
+
+.ob-dong-input {
+  width: 100%; height: 52px;
+  background: var(--neutral-100);
+  border: 1.5px solid var(--neutral-300);
+  border-radius: var(--r-md);
+  padding: 0 14px;
+  font: var(--B4); color: var(--neutral-1000);
+  outline: none; transition: border-color 0.15s;
+}
+.ob-dong-input:focus { border-color: var(--neutral-700); }
+.ob-dong-input::placeholder { color: var(--ink-3); }
+
 /* Bottom bar */
 .ob-bottom {
   padding: 20px 20px 32px;
@@ -2411,11 +2438,31 @@ body {
         </div>
       </div>
 
+      <!-- Step 4: 동네 -->
+      <div class="ob-slide">
+        <div class="ob-step-head">
+          <div class="ob-step-label">내 동네</div>
+          <div class="ob-step-title">집과 회사 동네를<br>알려주세요</div>
+          <div class="ob-step-desc">"집 근처" · "직장 근처" 코스 추천에 사용돼요 · 나중에 변경 가능</div>
+        </div>
+        <div class="ob-dong-form">
+          <div class="ob-dong-field">
+            <label class="ob-dong-label">🏡 우리 동네</label>
+            <input class="ob-dong-input" id="ob-home-dong" type="text" placeholder="예: 서초동" maxlength="20">
+          </div>
+          <div class="ob-dong-field">
+            <label class="ob-dong-label">🏢 회사 동네</label>
+            <input class="ob-dong-input" id="ob-work-dong" type="text" placeholder="예: 역삼동" maxlength="20">
+          </div>
+        </div>
+      </div>
+
     </div><!-- /ob-slides -->
 
     <div class="ob-bottom">
       <div class="ob-dots" id="ob-dots">
         <div class="ob-dot active"></div>
+        <div class="ob-dot"></div>
         <div class="ob-dot"></div>
         <div class="ob-dot"></div>
       </div>
@@ -2744,7 +2791,6 @@ body {
       </div>
       <div class="sheet-actions">
         <button class="sheet-btn-start" onclick="startCourseFromSheet()">
-          <svg viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z"/></svg>
           기록 시작
         </button>
         <button class="sheet-btn-close" onclick="closeCourseSheet()" aria-label="닫기">
@@ -2939,17 +2985,23 @@ function updatePedoUI() {
 }
 
 function initPedometer() {
+  // iOS 13+는 반드시 사용자 제스처(버튼 탭) 안에서 권한 요청을 해야 하므로
+  // 여기서는 요청하지 않고, 시작하기 탭 시점(ensureMotionPermission)에 요청한다.
   if (typeof DeviceMotionEvent !== 'undefined' &&
-      typeof DeviceMotionEvent.requestPermission === 'function') {
-    document.getElementById('pedo-sensor-dot').addEventListener('click', () => {
-      DeviceMotionEvent.requestPermission()
-        .then(r => { if (r === 'granted') listenMotion(); })
-        .catch(() => {});
-    }, { once: true });
-  } else if (typeof DeviceMotionEvent !== 'undefined') {
-    listenMotion();
+      typeof DeviceMotionEvent.requestPermission !== 'function') {
+    listenMotion(); // Android 등 별도 권한 요청이 필요 없는 환경
   }
   updatePedoUI();
+}
+
+function ensureMotionPermission() {
+  if (pedo.sensorActive) return;
+  if (typeof DeviceMotionEvent !== 'undefined' &&
+      typeof DeviceMotionEvent.requestPermission === 'function') {
+    DeviceMotionEvent.requestPermission()
+      .then(r => { if (r === 'granted') listenMotion(); })
+      .catch(() => {});
+  }
 }
 
 function listenMotion() {
@@ -3172,6 +3224,7 @@ function obCanProceed() {
   if (obStep === 0) return true;
   if (obStep === 1) return obGoal !== null;
   if (obStep === 2) return obThemes.size > 0;
+  if (obStep === 3) return true; // 동네 입력은 선택사항
   return true;
 }
 
@@ -3191,7 +3244,7 @@ function obUpdateUI() {
   if (obStep === 0) {
     back.style.visibility = 'hidden';
     document.getElementById('ob-cta-label').textContent = '시작하기';
-  } else if (obStep === 1) {
+  } else if (obStep === 1 || obStep === 2) {
     back.style.visibility = 'visible';
     document.getElementById('ob-cta-label').textContent = '다음';
   } else {
@@ -3203,7 +3256,7 @@ function obUpdateUI() {
 
 function obNext() {
   if (!obCanProceed()) return;
-  if (obStep < 2) {
+  if (obStep < 3) {
     obStep++;
     obUpdateUI();
   } else {
@@ -3228,6 +3281,10 @@ function finishOnboarding() {
     const first = [...obThemes][0];
     if (FILTERS.includes(first)) activeFilter = first;
   }
+
+  // Apply 집·직장 동네
+  state.homeDong = document.getElementById('ob-home-dong').value.trim();
+  state.workDong = document.getElementById('ob-work-dong').value.trim();
 
   const el = document.getElementById('onboarding');
   el.classList.add('hidden');
@@ -3479,6 +3536,8 @@ const state = {
   dailyGoal: 6000,
   weeklySteps: 18651,
   weeklyGoal: 30000,
+  homeDong: '',
+  workDong: '',
 };
 
 function makeDemoRoute(cx, cy, rx, ry, pts) {
@@ -3654,12 +3713,7 @@ function startGeoTracking() {
   if (routePolyline) routePolyline.setPath([]);
   if (userMarker) { userMarker.setMap(null); userMarker = null; }
 
-  if (activeCourse && COURSE_GPS_ROUTES[activeCourse.id]) {
-    const c = COURSE_GPS_ROUTES[activeCourse.id][0];
-    leafletMap.setCenter(new naver.maps.LatLng(c[0], c[1]));
-    leafletMap.setZoom(16);
-  }
-
+  // 시작 화면은 항상 내 실제 위치가 우선 — 코스 좌표로 먼저 세팅하지 않음
   if (!navigator.geolocation) { _startSimFallback(); return; }
   navigator.geolocation.getCurrentPosition(
     (pos) => {
@@ -4105,6 +4159,8 @@ function startWalk() {
   pedo.sessionSteps = 0;
   state.followingServiceCourse = !!(activeCourse && COURSES.some(c => c.id === activeCourse.id));
 
+  ensureMotionPermission(); // 버튼 탭(사용자 제스처) 안에서 요청해야 iOS에서 허용됨
+
   document.getElementById('rec-badge').classList.add('visible');
   document.getElementById('rec-badge-paused').style.display = 'none';
   document.getElementById('pace-badge').classList.remove('visible');
@@ -4446,10 +4502,16 @@ function clearActiveCourse() {
 /* ═══════════════════════════════
    COURSES RENDER
 ═══════════════════════════════ */
+function filterLabel(f) {
+  if (f === '직장 근처' && state.workDong) return `직장 근처 · ${state.workDong}`;
+  if (f === '집 근처' && state.homeDong) return `집 근처 · ${state.homeDong}`;
+  return f;
+}
+
 function renderFilters() {
   const el = document.getElementById('filter-chips');
   el.innerHTML = FILTERS.map(f => `
-    <button class="filter-chip ${f === activeFilter ? 'active' : ''}" onclick="setFilter('${f}')">${f}</button>
+    <button class="filter-chip ${f === activeFilter ? 'active' : ''}" onclick="setFilter('${f}')">${filterLabel(f)}</button>
   `).join('');
 }
 
