@@ -455,6 +455,8 @@ body {
   background: var(--bg);
 }
 
+.filter-scroll { flex-shrink: 0; }
+
 .courses-scroll {
   flex: 1;
   min-height: 0;
@@ -736,6 +738,12 @@ body {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+.course-map-real {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* Difficulty badge on map */
@@ -2585,6 +2593,7 @@ body {
         <h1>코스</h1>
         <p>추천 코스와 내가 걸은 길</p>
       </div>
+      <div class="filter-scroll" id="filter-chips"></div>
 
       <div class="courses-scroll">
         <!-- 나의 코스 -->
@@ -2600,7 +2609,6 @@ body {
           </div>
         </div>
 
-        <div class="filter-scroll" id="filter-chips"></div>
         <div class="courses-list" id="courses-list"></div>
       </div>
     </div>
@@ -4442,7 +4450,9 @@ function renderCourses() {
   list.innerHTML = filtered.map(c => `
     <div class="course-card" id="card-${c.id}">
       <div class="course-map-preview">
-        <canvas id="preview-${c.id}"></canvas>
+        ${COURSE_GPS_ROUTES[c.id]
+          ? `<div class="course-map-real" id="preview-${c.id}"></div>`
+          : `<canvas id="preview-${c.id}"></canvas>`}
         <div class="course-diff-badge">
           <div class="diff-dots">${diffDots(c.difficulty, c.difficulty===3)}</div>
           <span style="color:var(--ink-2);font-size:12px;font-weight:700;line-height:140%">${['','쉬움','보통','어려움'][c.difficulty]}</span>
@@ -4476,10 +4486,44 @@ function renderCourses() {
   // Draw previews after DOM insert
   requestAnimationFrame(() => {
     filtered.forEach(c => {
-      const canvas = document.getElementById(`preview-${c.id}`);
-      if (canvas) drawCoursePreview(canvas, c.routeShape, c);
+      const el = document.getElementById(`preview-${c.id}`);
+      if (!el) return;
+      if (COURSE_GPS_ROUTES[c.id]) {
+        drawRealCourseMap(el, c.id);
+      } else {
+        drawCoursePreview(el, c.routeShape, c);
+      }
     });
   });
+}
+
+function drawRealCourseMap(container, courseId) {
+  const route = COURSE_GPS_ROUTES[courseId];
+  if (!route || !route.length) return;
+  // renderCourses()가 매번 innerHTML을 새로 그리므로 컨테이너도 매번 새 DOM — 맵도 항상 새로 생성
+  const map = new naver.maps.Map(container, {
+    draggable: false,
+    pinchZoom: false,
+    scrollWheel: false,
+    keyboardShortcuts: false,
+    disableDoubleClickZoom: true,
+    disableDoubleTapZoom: true,
+    disableTwoFingerTapZoom: true,
+    scaleControl: false,
+    logoControl: false,
+    mapDataControl: false,
+    zoomControl: false,
+  });
+  new naver.maps.Polyline({
+    map,
+    path: route.map(([lat, lng]) => new naver.maps.LatLng(lat, lng)),
+    strokeColor: '#1A1C20',
+    strokeWeight: 4,
+    strokeOpacity: 0.9,
+    strokeLineCap: 'round',
+    strokeLineJoin: 'round',
+  });
+  map.fitBounds(_getNaverBounds(route), { top: 16, right: 16, bottom: 16, left: 16 });
 }
 
 /* ═══════════════════════════════
