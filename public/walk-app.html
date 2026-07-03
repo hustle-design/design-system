@@ -2539,7 +2539,7 @@ body {
               <div class="home-stat-l">칼로리</div>
             </div>
           </div>
-          <button class="home-start-btn" onclick="startWalkFromHome()">
+          <button class="home-start-btn" onclick="startFreeWalk()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>
             산책 시작하기
           </button>
@@ -4151,6 +4151,12 @@ function startWalkFromHome() {
   document.getElementById('home-panel').classList.add('hidden');
   document.querySelector('.stats-overlay').classList.remove('hidden');
   startWalk();
+}
+
+// 코스 없이 홈에서 바로 "기록 시작"을 눌렀을 때 — 이전에 남아있던 activeCourse를 반드시 비운다
+function startFreeWalk() {
+  clearActiveCourse();
+  startWalkFromHome();
 }
 function startRecCourse() {
   const course = COURSES[homeRecIdx % COURSES.length];
