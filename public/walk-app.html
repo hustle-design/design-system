@@ -3019,8 +3019,10 @@ function onMotion(e) {
     if (now - pedo.lastPeak > pedo.minInterval) {
       pedo.lastPeak = now;
       pedo.totalSteps++;
-      pedo.sessionSteps++;
-      if (state.isWalking && !state.isPaused) {
+      // 기록 중엔 최근 실제 GPS 이동이 확인된 경우에만 걸음으로 인정 (손떨림·터치 진동 오탐 방지)
+      const recentlyMoving = now - state.lastGpsMoveAt < 8000;
+      if (state.isWalking && !state.isPaused && recentlyMoving) {
+        pedo.sessionSteps++;
         state.steps = pedo.sessionSteps;
         document.getElementById('steps-display').textContent =
           state.steps.toLocaleString('ko-KR');
@@ -3538,6 +3540,7 @@ const state = {
   weeklyGoal: 30000,
   homeDong: '',
   workDong: '',
+  lastGpsMoveAt: 0,
 };
 
 function makeDemoRoute(cx, cy, rx, ry, pts) {
@@ -3683,6 +3686,7 @@ function addRoutePoint(lat, lng, accuracy) {
     // 제자리에서도 GPS는 수~수십 m씩 흔들리므로, 정확도에 비례한 노이즈 필터 적용
     const noiseThreshold = usingSimulation ? 0 : Math.min(30, Math.max(8, (accuracy || 15) * 1.5));
     if (dist < noiseThreshold) return;
+    state.lastGpsMoveAt = Date.now(); // 가속도계 오탐 방지용 — 실제 이동이 확인된 시각
     state.distance += dist / 1000;
     document.getElementById('dist-display').textContent = state.distance.toFixed(2);
     if (!pedo.sensorActive) {
@@ -3713,12 +3717,22 @@ function startGeoTracking() {
   if (routePolyline) routePolyline.setPath([]);
   if (userMarker) { userMarker.setMap(null); userMarker = null; }
 
-  // 시작 화면은 항상 내 실제 위치가 우선 — 코스 좌표로 먼저 세팅하지 않음
+  // 코스를 선택하고 시작한 경우엔 해당 코스 위치를 먼저 보여주고,
+  // 홈에서 코스 없이 시작한 경우엔 내 실제 위치를 우선 보여준다.
+  const hasCourse = activeCourse && COURSE_GPS_ROUTES[activeCourse.id];
+  if (hasCourse) {
+    const c = COURSE_GPS_ROUTES[activeCourse.id][0];
+    leafletMap.setCenter(new naver.maps.LatLng(c[0], c[1]));
+    leafletMap.setZoom(16);
+  }
+
   if (!navigator.geolocation) { _startSimFallback(); return; }
   navigator.geolocation.getCurrentPosition(
     (pos) => {
-      leafletMap.setCenter(new naver.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-      leafletMap.setZoom(17);
+      if (!hasCourse) {
+        leafletMap.setCenter(new naver.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+        leafletMap.setZoom(17);
+      }
       usingSimulation = false;
       geoWatchId = navigator.geolocation.watchPosition(
         (p) => { if (state.isWalking) addRoutePoint(p.coords.latitude, p.coords.longitude, p.coords.accuracy); },
@@ -4156,6 +4170,7 @@ function startWalk() {
   state.startMs = Date.now();
   state.elapsed = 0;
   state.steps = 0; state.distance = 0; state.route = [];
+  state.lastGpsMoveAt = 0;
   pedo.sessionSteps = 0;
   state.followingServiceCourse = !!(activeCourse && COURSES.some(c => c.id === activeCourse.id));
 
