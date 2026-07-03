@@ -2254,6 +2254,13 @@ body {
   flex-direction: column;
 }
 
+.dong-result-section-label {
+  font: var(--C1); font-weight: 700;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  padding: 8px 4px;
+}
+
 .dong-result-item {
   width: 100%;
   text-align: left;
@@ -3530,6 +3537,8 @@ function openDongPicker(target) {
   document.getElementById('dong-picker-results').innerHTML = '';
   document.getElementById('dong-picker-sheet').classList.add('open');
   setTimeout(() => document.getElementById('dong-picker-input').focus(), 300);
+  // 시트를 열면 바로 현재 위치 기반 "주변 위치"를 먼저 보여준다 (버튼 탭 없이도)
+  useCurrentLocationForDong();
 }
 
 function closeDongPicker() {
@@ -3549,20 +3558,25 @@ async function searchDong(q) {
   try {
     const res = await fetch(`/api/geocode?query=${encodeURIComponent(q)}`);
     const data = await res.json();
+    if (data.error) {
+      list.innerHTML = `<div class="dong-result-empty">${data.message || data.error}</div>`;
+      return;
+    }
     dongSearchResults = data.results || [];
-    renderDongResults(dongSearchResults);
+    renderDongResults(dongSearchResults, null);
   } catch (e) {
     list.innerHTML = '<div class="dong-result-empty">검색에 실패했어요. 잠시 후 다시 시도해주세요.</div>';
   }
 }
 
-function renderDongResults(results) {
+function renderDongResults(results, sectionLabel) {
   const list = document.getElementById('dong-picker-results');
+  const label = sectionLabel ? `<div class="dong-result-section-label">${sectionLabel}</div>` : '';
   if (!results.length) {
-    list.innerHTML = '<div class="dong-result-empty">검색 결과가 없어요</div>';
+    list.innerHTML = label + '<div class="dong-result-empty">검색 결과가 없어요</div>';
     return;
   }
-  list.innerHTML = results.map((r, i) => `
+  list.innerHTML = label + results.map((r, i) => `
     <button class="dong-result-item" onclick="selectDongResult(${i})">
       <div class="dong-result-road">${r.roadAddress || r.jibunAddress}</div>
       ${r.roadAddress && r.jibunAddress ? `<div class="dong-result-jibun">${r.jibunAddress}</div>` : ''}
@@ -3582,24 +3596,41 @@ function extractDongLabel(address) {
 }
 
 function useCurrentLocationForDong() {
-  if (!navigator.geolocation) return;
+  const list = document.getElementById('dong-picker-results');
   const btn = document.getElementById('dong-picker-gps-btn');
+  if (!navigator.geolocation) return;
   btn.classList.add('loading');
+  list.innerHTML = '<div class="dong-result-loading">주변 위치를 찾는 중…</div>';
   navigator.geolocation.getCurrentPosition(async (pos) => {
+    const { latitude, longitude } = pos.coords;
     try {
-      const res = await fetch(`/api/geocode?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`);
+      const res = await fetch(`/api/geocode?lat=${latitude}&lng=${longitude}`);
       const data = await res.json();
       btn.classList.remove('loading');
+      if (data.error) {
+        list.innerHTML = `<div class="dong-result-empty">${data.message || data.error}</div>`;
+        return;
+      }
       if (data.dong) {
-        applyDongSelection(data.dong, pos.coords.latitude, pos.coords.longitude);
+        window._gpsDongResult = { label: data.dong, lat: latitude, lng: longitude };
+        list.innerHTML = `
+          <div class="dong-result-section-label">주변 위치</div>
+          <button class="dong-result-item" onclick="applyDongSelection(window._gpsDongResult.label, window._gpsDongResult.lat, window._gpsDongResult.lng)">
+            <div class="dong-result-road">📍 ${data.dong}</div>
+            <div class="dong-result-jibun">현재 위치 기준</div>
+          </button>
+        `;
       } else {
-        document.getElementById('dong-picker-results').innerHTML = '<div class="dong-result-empty">현재 위치의 주소를 찾지 못했어요</div>';
+        list.innerHTML = '<div class="dong-result-empty">현재 위치의 주소를 찾지 못했어요</div>';
       }
     } catch (e) {
       btn.classList.remove('loading');
-      document.getElementById('dong-picker-results').innerHTML = '<div class="dong-result-empty">현재 위치 조회에 실패했어요</div>';
+      list.innerHTML = '<div class="dong-result-empty">현재 위치 조회에 실패했어요</div>';
     }
-  }, () => { btn.classList.remove('loading'); }, { enableHighAccuracy: true, timeout: 8000 });
+  }, () => {
+    btn.classList.remove('loading');
+    list.innerHTML = '<div class="dong-result-empty">위치 권한을 확인해주세요</div>';
+  }, { enableHighAccuracy: true, timeout: 8000 });
 }
 
 function applyDongSelection(label, lat, lng) {
