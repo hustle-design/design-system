@@ -3535,6 +3535,7 @@ function finishOnboarding() {
   }
 
   // 집·직장 동네는 openDongPicker/applyDongSelection에서 선택 즉시 state에 반영됨
+  closeDongPicker(); // 열어둔 채로 온보딩을 완료해도 뒤에 남지 않도록
 
   const el = document.getElementById('onboarding');
   el.classList.add('hidden');
@@ -5318,7 +5319,16 @@ function updateClock() {
 /* ═══════════════════════════════
    INIT
 ═══════════════════════════════ */
+// bfcache로 페이지가 복원될 때는 load가 다시 발생하지 않으므로 별도로 처리
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    document.getElementById('dong-picker-sheet').classList.remove('open');
+  }
+});
+
 window.addEventListener('load', () => {
+  // 시트가 열린 채 남아있는 경우를 대비해 항상 닫힌 상태로 시작
+  document.getElementById('dong-picker-sheet').classList.remove('open');
   initMap();
   renderHistory();
   updateGoals();
