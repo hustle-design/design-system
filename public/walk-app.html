@@ -194,6 +194,25 @@ body {
 .locate-btn.active { color: #1a73e8; }
 .locate-btn.loading { opacity: 0.5; }
 
+.camera-btn {
+  position: absolute;
+  top: 72px;
+  right: 16px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--surface, #fff);
+  border: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.16);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink);
+  cursor: pointer;
+  z-index: 5;
+  transition: transform 0.15s;
+}
+.camera-btn:active { transform: scale(0.92); }
+.camera-btn.hidden { display: none; }
+.camera-btn.captured { background: var(--ink); color: #fff; transition: none; }
+
 #accuracy-warning {
   display: none;
   position: absolute;
@@ -1080,6 +1099,32 @@ body {
   color: var(--ink-3);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.archive-photo-row {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px 4px;
+}
+.archive-photo-card {
+  flex: 1;
+  aspect-ratio: 1;
+  border-radius: var(--r-lg);
+  background-color: var(--neutral-200);
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+.archive-photo-badge {
+  position: absolute;
+  left: 8px; bottom: 8px;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 99px;
 }
 .archive-saved-card { border-bottom: 1px solid var(--neutral-200); }
 .archive-report-btn {
@@ -2648,6 +2693,13 @@ body {
             <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
           </svg>
         </button>
+        <button class="camera-btn hidden" id="camera-btn" onclick="document.getElementById('camera-input').click()" aria-label="사진 촬영">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 8a2 2 0 0 1 2-2h1.2l.9-1.5A2 2 0 0 1 9.8 3.5h4.4a2 2 0 0 1 1.7 1L16.8 6H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z"/>
+            <circle cx="12" cy="13" r="3.4"/>
+          </svg>
+        </button>
+        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="onCapturePhoto(event)">
         <div id="accuracy-warning"></div>
       </div>
 
@@ -2883,6 +2935,11 @@ body {
       <div class="tab-header">
         <h1>아카이브</h1>
         <p>내가 걸은 길 <span id="total-walks">3</span>개</p>
+      </div>
+      <!-- 산책 중 찍은 사진 (최근 3개) -->
+      <div id="archive-photo-strip" style="display:none">
+        <div class="archive-section-label">최근 사진</div>
+        <div class="archive-photo-row" id="archive-photo-row"></div>
       </div>
       <!-- 저장된 코스 (제보 가능) -->
       <div id="archive-saved-section" style="display:none">
@@ -3809,6 +3866,7 @@ const state = {
   homeCoord: null,
   workCoord: null,
   lastGpsMoveAt: 0,
+  photos: [],
 };
 
 function makeDemoRoute(cx, cy, rx, ry, pts) {
@@ -3925,6 +3983,27 @@ function centerOnMyLocation() {
     () => { btn.classList.remove('loading'); },
     { enableHighAccuracy: true, timeout: 5000 }
   );
+}
+
+function onCapturePhoto(event) {
+  const file = event.target.files && event.target.files[0];
+  event.target.value = ''; // 같은 파일이라도 다시 촬영 가능하게 초기화
+  if (!file || !state.isWalking) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const last = state.route[state.route.length - 1];
+    state.photos.push({
+      dataUrl: reader.result,
+      lat: last ? last.lat : null,
+      lng: last ? last.lng : null,
+      t: Date.now(),
+    });
+    const btn = document.getElementById('camera-btn');
+    btn.classList.add('captured');
+    setTimeout(() => btn.classList.remove('captured'), 350);
+  };
+  reader.readAsDataURL(file);
 }
 
 function _getNaverBounds(coords) {
@@ -4462,6 +4541,7 @@ function startWalk() {
   state.elapsed = 0;
   state.steps = 0; state.distance = 0; state.route = [];
   state.lastGpsMoveAt = 0;
+  state.photos = [];
   pedo.sessionSteps = 0;
   state.followingServiceCourse = !!(activeCourse && COURSES.some(c => c.id === activeCourse.id));
 
@@ -4473,6 +4553,7 @@ function startWalk() {
   document.getElementById('pace-badge').innerHTML = `--'--"<span class="pace-unit">/km</span>`;
   document.getElementById('stop-walk-fab').classList.remove('hidden');
   document.getElementById('pause-walk-btn').classList.remove('hidden');
+  document.getElementById('camera-btn').classList.remove('hidden');
   document.getElementById('pause-walk-btn').classList.remove('paused');
   document.getElementById('pause-label').textContent = '일시정지';
   document.getElementById('pause-icon').innerHTML = '<rect x="6" y="5" width="4" height="14" rx="1.5"/><rect x="14" y="5" width="4" height="14" rx="1.5"/>';
@@ -4497,6 +4578,7 @@ function stopWalk() {
   document.getElementById('rec-badge-paused').style.display = 'none';
   document.getElementById('stop-walk-fab').classList.add('hidden');
   document.getElementById('pause-walk-btn').classList.add('hidden');
+  document.getElementById('camera-btn').classList.add('hidden');
   document.getElementById('pace-badge').classList.remove('visible');
   document.getElementById('nav').style.opacity = '1';
   document.getElementById('nav').style.pointerEvents = '';
@@ -4518,6 +4600,7 @@ function stopWalk() {
       steps: state.steps,
       distance: parseFloat(state.distance.toFixed(2)),
       route: [...state.route],
+      photos: [...state.photos],
       followingServiceCourse: state.followingServiceCourse
     };
     state.history.unshift(entry);
@@ -4536,7 +4619,7 @@ function stopWalk() {
   document.getElementById('dist-display').textContent = '0.00';
   document.getElementById('kcal-display').textContent = '0';
   document.getElementById('pace-badge').innerHTML = `--'--"<span class="pace-unit">/km</span>`;
-  state.elapsed = 0; state.route = []; state.steps = 0; state.distance = 0;
+  state.elapsed = 0; state.route = []; state.steps = 0; state.distance = 0; state.photos = [];
   drawMap();
   // 홈 패널로 복귀
   document.getElementById('home-panel').classList.remove('hidden');
@@ -5014,6 +5097,21 @@ function renderHomePanel() {
 }
 
 function renderHistory() {
+  // ── 산책 중 찍은 사진 (최근 3개)
+  const photoStrip = document.getElementById('archive-photo-strip');
+  const photoRow = document.getElementById('archive-photo-row');
+  const withPhotos = state.history.filter(h => h.photos && h.photos.length > 0).slice(0, 3);
+  if (withPhotos.length > 0) {
+    photoStrip.style.display = 'block';
+    photoRow.innerHTML = withPhotos.map(h => `
+      <div class="archive-photo-card" style="background-image:url('${h.photos[0].dataUrl}')">
+        <span class="archive-photo-badge">${h.distance.toFixed(1)}km</span>
+      </div>
+    `).join('');
+  } else {
+    photoStrip.style.display = 'none';
+  }
+
   // ── 저장한 코스 섹션 (myArchives)
   const savedSection = document.getElementById('archive-saved-section');
   const savedList = document.getElementById('archive-saved-list');
