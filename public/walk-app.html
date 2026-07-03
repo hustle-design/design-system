@@ -1183,7 +1183,7 @@ body {
   align-items: center;
   gap: 4px;
   padding: 6px 16px 5px;
-  border-radius: 24px;
+  border-radius: 999px;
   transition: background 0.18s;
 }
 
@@ -1654,10 +1654,12 @@ body {
   overflow: hidden;
 }
 
-.sheet-map canvas {
+.sheet-map canvas,
+.sheet-map #sheet-map-canvas {
   width: 100%;
   height: 100%;
   display: block;
+  pointer-events: none;
 }
 
 /* Scrollable body */
@@ -2716,7 +2718,7 @@ body {
     <div class="course-sheet-panel">
       <div class="sheet-handle"></div>
       <div class="sheet-map">
-        <canvas id="sheet-map-canvas"></canvas>
+        <div id="sheet-map-canvas"></div>
       </div>
       <div class="sheet-body">
         <div class="sheet-area-tag" id="sheet-area">—</div>
@@ -4405,8 +4407,16 @@ function selectCourse(course) {
 
   // Draw map after two rAF cycles so CSS transition has applied and offsetWidth is real
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    const canvas = document.getElementById('sheet-map-canvas');
-    if (canvas) drawCoursePreview(canvas, course.routeShape, course);
+    const wrap = document.getElementById('sheet-map-canvas');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    if (COURSE_GPS_ROUTES[course.id]) {
+      drawRealCourseMap(wrap, course.id);
+    } else {
+      const canvas = document.createElement('canvas');
+      wrap.appendChild(canvas);
+      drawCoursePreview(canvas, course.routeShape, course);
+    }
   }));
 }
 
