@@ -2,6 +2,7 @@
   "routes": [
     { "src": "/storybook", "dest": "/storybook/index.html" },
     { "src": "/storybook/(.*)", "dest": "/storybook/$1" },
+    { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 }

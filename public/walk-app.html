@@ -2099,17 +2099,133 @@ body {
   margin-bottom: 8px;
 }
 
-.ob-dong-input {
+.ob-dong-picker {
   width: 100%; height: 52px;
   background: var(--neutral-100);
   border: 1.5px solid var(--neutral-300);
   border-radius: var(--r-md);
   padding: 0 14px;
-  font: var(--B4); color: var(--neutral-1000);
-  outline: none; transition: border-color 0.15s;
+  display: flex; align-items: center; justify-content: space-between;
+  font: var(--B4); color: var(--neutral-1000); font-weight: 600;
+  cursor: pointer; transition: border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
-.ob-dong-input:focus { border-color: var(--neutral-700); }
-.ob-dong-input::placeholder { color: var(--ink-3); }
+.ob-dong-picker:active { border-color: var(--neutral-700); }
+.ob-dong-picker svg { color: var(--ink-3); flex-shrink: 0; }
+.ob-dong-picker-text.placeholder { color: var(--ink-3); font-weight: 400; }
+
+/* ── 주소 설정 시트 ── */
+#dong-picker-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 65;
+  pointer-events: none;
+  background: transparent;
+  transition: background 0.32s;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+#dong-picker-sheet.open {
+  pointer-events: all;
+  background: rgba(0,0,0,0.42);
+}
+#dong-picker-sheet .course-sheet-backdrop {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+#dong-picker-sheet .course-sheet-panel {
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px 20px 0 0;
+  background: var(--neutral-0);
+  height: 88vh;
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+#dong-picker-sheet.open .course-sheet-panel {
+  transform: translateY(0);
+}
+#dong-picker-sheet .course-sheet-panel::before {
+  content: '';
+  display: block;
+  width: 36px; height: 4px;
+  background: var(--neutral-400);
+  border-radius: 2px;
+  margin: 12px auto 4px;
+  flex-shrink: 0;
+}
+
+.dong-picker-body {
+  padding: 16px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.dong-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--neutral-100);
+  border-radius: var(--r-md);
+  padding: 0 14px;
+  height: 48px;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+.dong-search-input {
+  flex: 1;
+  border: none; background: none; outline: none;
+  font: var(--B4); color: var(--neutral-1000);
+  height: 100%;
+}
+.dong-search-input::placeholder { color: var(--ink-3); }
+
+.dong-gps-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  height: 48px;
+  border: 1.5px solid var(--neutral-300);
+  border-radius: var(--r-md);
+  background: var(--neutral-0);
+  font: var(--B4); font-weight: 700; color: var(--neutral-1000);
+  cursor: pointer; flex-shrink: 0;
+}
+.dong-gps-btn.loading { opacity: 0.5; pointer-events: none; }
+.dong-gps-btn:active { background: var(--neutral-100); }
+
+.dong-result-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+}
+
+.dong-result-item {
+  width: 100%;
+  text-align: left;
+  background: none; border: none;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--neutral-200);
+  cursor: pointer;
+}
+.dong-result-item:active { background: var(--neutral-100); }
+.dong-result-road { font: var(--B4); font-weight: 600; color: var(--neutral-1000); }
+.dong-result-jibun { font: var(--C1); color: var(--ink-3); margin-top: 2px; }
+
+.dong-result-loading, .dong-result-empty {
+  text-align: center;
+  padding: 32px 0;
+  font: var(--B5); color: var(--ink-3);
+}
 
 /* Bottom bar */
 .ob-bottom {
@@ -2465,11 +2581,17 @@ body {
         <div class="ob-dong-form">
           <div class="ob-dong-field">
             <label class="ob-dong-label">🏡 우리 동네</label>
-            <input class="ob-dong-input" id="ob-home-dong" type="text" placeholder="예: 서초동" maxlength="20">
+            <button type="button" class="ob-dong-picker" id="ob-home-picker" onclick="openDongPicker('home')">
+              <span class="ob-dong-picker-text placeholder" id="ob-home-display">동네를 검색해주세요</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
           </div>
           <div class="ob-dong-field">
             <label class="ob-dong-label">🏢 회사 동네</label>
-            <input class="ob-dong-input" id="ob-work-dong" type="text" placeholder="예: 역삼동" maxlength="20">
+            <button type="button" class="ob-dong-picker" id="ob-work-picker" onclick="openDongPicker('work')">
+              <span class="ob-dong-picker-text placeholder" id="ob-work-display">동네를 검색해주세요</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -2489,6 +2611,30 @@ body {
     </div>
 
   </div><!-- /onboarding -->
+
+  <!-- ── 주소 설정 시트 (동네 검색) ── -->
+  <div id="dong-picker-sheet">
+    <div class="course-sheet-backdrop" onclick="closeDongPicker()"></div>
+    <div class="course-sheet-panel">
+      <div class="report-sheet-head">
+        <button class="report-back-btn" onclick="closeDongPicker()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="report-sheet-title">주소 설정</div>
+      </div>
+      <div class="dong-picker-body">
+        <div class="dong-search-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input class="dong-search-input" id="dong-picker-input" type="text" placeholder="도로명, 건물명, 지번으로 검색" oninput="onDongSearchInput(this.value)">
+        </div>
+        <button class="dong-gps-btn" id="dong-picker-gps-btn" onclick="useCurrentLocationForDong()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          현재 위치로 찾기
+        </button>
+        <div class="dong-result-list" id="dong-picker-results"></div>
+      </div>
+    </div>
+  </div>
 
   <div id="content">
 
@@ -3302,9 +3448,7 @@ function finishOnboarding() {
     if (FILTERS.includes(first)) activeFilter = first;
   }
 
-  // Apply 집·직장 동네
-  state.homeDong = document.getElementById('ob-home-dong').value.trim();
-  state.workDong = document.getElementById('ob-work-dong').value.trim();
+  // 집·직장 동네는 openDongPicker/applyDongSelection에서 선택 즉시 state에 반영됨
 
   const el = document.getElementById('onboarding');
   el.classList.add('hidden');
@@ -3314,6 +3458,110 @@ function finishOnboarding() {
   updateGoals();
   renderFilters();
   renderCourses();
+}
+
+/* ═══════════════════════════════
+   주소 설정 (동네 검색) — Naver Geocoding 프록시 사용
+═══════════════════════════════ */
+let dongPickerTarget = null; // 'home' | 'work'
+let dongSearchTimer = null;
+let dongSearchResults = [];
+
+function openDongPicker(target) {
+  dongPickerTarget = target;
+  document.getElementById('dong-picker-input').value = '';
+  document.getElementById('dong-picker-results').innerHTML = '';
+  document.getElementById('dong-picker-sheet').classList.add('open');
+  setTimeout(() => document.getElementById('dong-picker-input').focus(), 300);
+}
+
+function closeDongPicker() {
+  document.getElementById('dong-picker-sheet').classList.remove('open');
+}
+
+function onDongSearchInput(val) {
+  clearTimeout(dongSearchTimer);
+  const q = val.trim();
+  if (!q) { document.getElementById('dong-picker-results').innerHTML = ''; return; }
+  dongSearchTimer = setTimeout(() => searchDong(q), 350);
+}
+
+async function searchDong(q) {
+  const list = document.getElementById('dong-picker-results');
+  list.innerHTML = '<div class="dong-result-loading">검색 중…</div>';
+  try {
+    const res = await fetch(`/api/geocode?query=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    dongSearchResults = data.results || [];
+    renderDongResults(dongSearchResults);
+  } catch (e) {
+    list.innerHTML = '<div class="dong-result-empty">검색에 실패했어요. 잠시 후 다시 시도해주세요.</div>';
+  }
+}
+
+function renderDongResults(results) {
+  const list = document.getElementById('dong-picker-results');
+  if (!results.length) {
+    list.innerHTML = '<div class="dong-result-empty">검색 결과가 없어요</div>';
+    return;
+  }
+  list.innerHTML = results.map((r, i) => `
+    <button class="dong-result-item" onclick="selectDongResult(${i})">
+      <div class="dong-result-road">${r.roadAddress || r.jibunAddress}</div>
+      ${r.roadAddress && r.jibunAddress ? `<div class="dong-result-jibun">${r.jibunAddress}</div>` : ''}
+    </button>
+  `).join('');
+}
+
+function selectDongResult(i) {
+  const r = dongSearchResults[i];
+  if (!r) return;
+  applyDongSelection(extractDongLabel(r.roadAddress || r.jibunAddress), r.lat, r.lng);
+}
+
+function extractDongLabel(address) {
+  const m = address.match(/([가-힣0-9]+(동|읍|면))(?!\S)/);
+  return m ? m[1] : address;
+}
+
+function useCurrentLocationForDong() {
+  if (!navigator.geolocation) return;
+  const btn = document.getElementById('dong-picker-gps-btn');
+  btn.classList.add('loading');
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try {
+      const res = await fetch(`/api/geocode?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`);
+      const data = await res.json();
+      btn.classList.remove('loading');
+      if (data.dong) {
+        applyDongSelection(data.dong, pos.coords.latitude, pos.coords.longitude);
+      } else {
+        document.getElementById('dong-picker-results').innerHTML = '<div class="dong-result-empty">현재 위치의 주소를 찾지 못했어요</div>';
+      }
+    } catch (e) {
+      btn.classList.remove('loading');
+      document.getElementById('dong-picker-results').innerHTML = '<div class="dong-result-empty">현재 위치 조회에 실패했어요</div>';
+    }
+  }, () => { btn.classList.remove('loading'); }, { enableHighAccuracy: true, timeout: 8000 });
+}
+
+function applyDongSelection(label, lat, lng) {
+  const coord = { lat, lng };
+  if (dongPickerTarget === 'home') {
+    state.homeDong = label;
+    state.homeCoord = coord;
+    const el = document.getElementById('ob-home-display');
+    el.textContent = label;
+    el.classList.remove('placeholder');
+  } else if (dongPickerTarget === 'work') {
+    state.workDong = label;
+    state.workCoord = coord;
+    const el = document.getElementById('ob-work-display');
+    el.textContent = label;
+    el.classList.remove('placeholder');
+  }
+  closeDongPicker();
+  renderFilters();
 }
 
 /* ═══════════════════════════════
@@ -3558,6 +3806,8 @@ const state = {
   weeklyGoal: 30000,
   homeDong: '',
   workDong: '',
+  homeCoord: null,
+  workCoord: null,
   lastGpsMoveAt: 0,
 };
 
