@@ -193,6 +193,23 @@ body {
 .locate-btn:active { transform: scale(0.92); }
 .locate-btn.active { color: #1a73e8; }
 .locate-btn.loading { opacity: 0.5; }
+
+#accuracy-warning {
+  display: none;
+  position: absolute;
+  top: 20px;
+  left: 16px;
+  right: 72px;
+  background: rgba(26,28,32,0.88);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 10px 14px;
+  border-radius: 14px;
+  z-index: 6;
+}
+#accuracy-warning.visible { display: block; }
 #map .naver-control-zoom { display: none; }
 
 .stats-overlay {
@@ -2485,6 +2502,7 @@ body {
             <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
           </svg>
         </button>
+        <div id="accuracy-warning"></div>
       </div>
 
       <!-- 숨김 처리된 만보기 DOM (updatePedoUI 참조용) -->
@@ -3620,10 +3638,25 @@ function initMap() {
       (pos) => {
         leafletMap.setCenter(new naver.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
         leafletMap.setZoom(15);
+        checkLocationAccuracy(pos.coords.accuracy);
       },
       () => {},
       { enableHighAccuracy: false, timeout: 5000 }
     );
+  }
+}
+
+// iOS "정확한 위치"가 꺼져있으면 GPS 대신 반경 수백m~수km짜리 뭉뚱그려진 좌표가 오는데,
+// 그게 종종 시청·광화문 같은 도심 랜드마크 근처로 스냅되어 "엉뚱한 위치"처럼 보인다.
+// 코드 버그가 아니라 OS 설정 문제라는 걸 사용자가 바로 알 수 있게 경고 배지로 노출한다.
+function checkLocationAccuracy(accuracy) {
+  const el = document.getElementById('accuracy-warning');
+  if (!el) return;
+  if (accuracy != null && accuracy > 200) {
+    el.textContent = `위치 정확도가 낮아요 (오차범위 약 ${Math.round(accuracy).toLocaleString('ko-KR')}m). 설정 > 개인정보 보호 > 위치 서비스 > Safari 웹 사이트에서 "정확한 위치"를 켜주세요.`;
+    el.classList.add('visible');
+  } else {
+    el.classList.remove('visible');
   }
 }
 
@@ -3637,6 +3670,7 @@ function centerOnMyLocation() {
       leafletMap.setZoom(17);
       btn.classList.remove('loading');
       btn.classList.add('active');
+      checkLocationAccuracy(pos.coords.accuracy);
     },
     () => { btn.classList.remove('loading'); },
     { enableHighAccuracy: true, timeout: 5000 }
@@ -3733,6 +3767,7 @@ function startGeoTracking() {
         leafletMap.setCenter(new naver.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
         leafletMap.setZoom(17);
       }
+      checkLocationAccuracy(pos.coords.accuracy);
       usingSimulation = false;
       geoWatchId = navigator.geolocation.watchPosition(
         (p) => { if (state.isWalking) addRoutePoint(p.coords.latitude, p.coords.longitude, p.coords.accuracy); },
