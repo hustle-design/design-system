@@ -4642,7 +4642,8 @@ function stopWalk() {
     updatePedoUI();
   }
 
-  if (elapsed > 10 && state.route.length > 2 && state.distance >= 0.03) {
+  // 사진을 찍었다면 산책이 짧아도 기록을 남긴다 (안 그러면 사진이 통째로 버려짐)
+  if ((elapsed > 10 && state.route.length > 2 && state.distance >= 0.03) || state.photos.length > 0) {
     const now = new Date();
     const entry = {
       id: Date.now(),
