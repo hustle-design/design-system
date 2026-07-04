@@ -1131,22 +1131,32 @@ body {
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
 .cal-cell {
   position: relative;
   aspect-ratio: 1;
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   background-color: var(--neutral-100);
   background-size: cover;
   background-position: center;
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
-.cal-cell.empty { background: none; }
+.cal-cell.other-month {
+  background: none;
+}
+.cal-cell.other-month .cal-day-num {
+  color: var(--ink-3);
+  font-weight: 500;
+}
 .cal-cell.today { box-shadow: inset 0 0 0 2px var(--ink); }
+.cal-cell.has-photo {
+  align-items: flex-end;
+  justify-content: flex-start;
+}
 .cal-cell.has-photo::before {
   content: '';
   position: absolute; inset: 0;
@@ -1155,11 +1165,14 @@ body {
 .cal-day-num {
   position: relative;
   z-index: 1;
-  font: var(--C2); font-weight: 600;
+  font: var(--B4); font-weight: 700;
   color: var(--ink-2);
-  padding: 4px 6px;
 }
-.cal-cell.has-photo .cal-day-num { color: #fff; font-weight: 700; }
+.cal-cell.has-photo .cal-day-num {
+  color: #fff;
+  font: var(--C1); font-weight: 700;
+  padding: 8px;
+}
 
 .archive-saved-card { border-bottom: 1px solid var(--neutral-200); }
 .archive-report-btn {
@@ -5185,11 +5198,15 @@ function renderCalendar() {
 
   const firstDow = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const prevMonthDays = new Date(calYear, calMonth, 0).getDate();
   const today = new Date();
   const isCurrentMonth = today.getFullYear() === calYear && today.getMonth() === calMonth;
 
   let cells = '';
-  for (let i = 0; i < firstDow; i++) cells += '<div class="cal-cell empty"></div>';
+  // 이전 달 꼬리 날짜 — 흐리게, 배경 없이
+  for (let i = firstDow - 1; i >= 0; i--) {
+    cells += `<div class="cal-cell other-month"><span class="cal-day-num">${prevMonthDays - i}</span></div>`;
+  }
   for (let day = 1; day <= daysInMonth; day++) {
     const photo = photoByDay[day];
     const isToday = isCurrentMonth && today.getDate() === day;
@@ -5198,6 +5215,13 @@ function renderCalendar() {
         <span class="cal-day-num">${day}</span>
       </div>
     `;
+  }
+  // 다음 달 시작 날짜 — 마지막 줄을 7칸으로 채움
+  const trailing = (firstDow + daysInMonth) % 7;
+  if (trailing !== 0) {
+    for (let day = 1; day <= 7 - trailing; day++) {
+      cells += `<div class="cal-cell other-month"><span class="cal-day-num">${day}</span></div>`;
+    }
   }
   document.getElementById('cal-grid').innerHTML = cells;
 }
