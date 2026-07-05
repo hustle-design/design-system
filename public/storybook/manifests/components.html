@@ -588,13 +588,13 @@
 <header>
   <div class="wrap">
     <h1>Manifest Debugger</h1>
-    <div class="summary"><a class="filter-pill all" data-k="all" href="#filter-all">All</a><span class="filter-pill ok" aria-disabled="true">2 components ok</span><a class="filter-pill info" data-k="infos" href="#filter-infos">2/2 infos</a><span class="filter-pill ok" aria-disabled="true">11 stories ok</span></div>
+    <div class="summary"><a class="filter-pill all" data-k="all" href="#filter-all">All</a><span class="filter-pill ok" aria-disabled="true">4 components ok</span><a class="filter-pill info" data-k="infos" href="#filter-infos">3/4 infos</a><span class="filter-pill ok" aria-disabled="true">21 stories ok</span></div>
   </div>
 </header>
 <main>
   <div class="wrap">
     <div class="note info" style="margin-bottom: 16px;">
-            <strong>Tip:</strong> You are using <code>react-docgen</code> (the default). Generation took <strong>0.1s</strong>. For higher quality prop types, consider switching to <code>react-docgen-typescript</code> in your <code>main.ts</code>:
+            <strong>Tip:</strong> You are using <code>react-docgen</code> (the default). Generation took <strong>0.2s</strong>. For higher quality prop types, consider switching to <code>react-docgen-typescript</code> in your <code>main.ts</code>:
             <pre><code>typescript: {
   reactDocgen: 'react-docgen-typescript',
 }</code></pre>
@@ -732,14 +732,357 @@ group?: ColorGroup | &#39;all&#39; = &#39;all&#39;</code></pre>
   no-story-error
   no-doc-error"
   role="listitem"
+  aria-label="Icon">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> Icon</h2>
+      <div class="badges">
+        <label for="c-1-components-icon-props" class="badge ok as-toggle">3 prop types</label>
+        <label for="c-1-components-icon-info" class="badge info as-toggle">1 info</label>
+        <label for="c-1-components-icon-stories" class="badge ok as-toggle">5 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/Icon/Icon.stories.tsx">components-icon · ./src/components/Icon/Icon.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  <input id="c-1-components-icon-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-1-components-icon-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  <input id="c-1-components-icon-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">3 prop types</span>
+            </div>
+            <pre><code>Component: src/components/Icon/Icon.tsx::Icon</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>color?: string = &#39;#2a3038&#39;
+
+size?: number = 20
+
+type: | &#39;blank&#39;
+| &#39;error&#39;
+| &#39;right&#39;
+| &#39;left&#39;
+| &#39;bottom&#39;
+| &#39;copy&#39;
+| &#39;noti&#39;
+| &#39;plus&#39;
+| &#39;more&#39;
+| &#39;close&#39;
+| &#39;share&#39;
+| &#39;storageFill&#39;
+| &#39;storage&#39;
+| &#39;lock&#39;
+| &#39;camera&#39;
+| &#39;search&#39;
+| &#39;home&#39;
+| &#39;setting&#39;
+| &#39;cart&#39;
+| &#39;menu&#39;
+| &#39;back&#39;
+| &#39;alarm&#39;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Icon } from "design-system";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; &lt;Icon type=&quot;home&quot; size={24} color={colors.neutral[950]} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">❖ System Icon Component</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SystemIconSet = () =&gt; &lt;IconGrid types={SYSTEM_ICONS} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">❖ Navigation Bar Item 아이콘</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const NavigationBarIconSet = () =&gt; &lt;IconGrid types={NAV_ICONS} /&gt;;</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">사이즈</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const AllSizes = () =&gt; (
+  &lt;div style={{ display: &#39;flex&#39;, alignItems: &#39;center&#39;, gap: 20 }}&gt;
+    {[16, 20, 24, 32, 40].map((s) =&gt; (
+      &lt;div key={s} style={{ display: &#39;flex&#39;, flexDirection: &#39;column&#39;, alignItems: &#39;center&#39;, gap: 6 }}&gt;
+        &lt;Icon type=&quot;home&quot; size={s} color={colors.neutral[950]} /&gt;
+        &lt;span style={{ fontSize: 11, color: colors.neutral[700] }}&gt;{s}px&lt;/span&gt;
+      &lt;/div&gt;
+    ))}
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">색상</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Colors = () =&gt; (
+  &lt;div style={{ display: &#39;flex&#39;, alignItems: &#39;center&#39;, gap: 20 }}&gt;
+    {[colors.neutral[950], colors.neutral[700], colors.blue[700], colors.red[700], colors.green[700]].map((c) =&gt; (
+      &lt;Icon key={c} type=&quot;noti&quot; size={28} color={c} /&gt;
+    ))}
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  no-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
+  aria-label="NavigationBar">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-ok"></span> NavigationBar</h2>
+      <div class="badges">
+        <label for="c-2-components-navigationbar-props" class="badge ok as-toggle">4 prop types</label>
+        
+        <label for="c-2-components-navigationbar-stories" class="badge ok as-toggle">5 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/components/NavigationBar/NavigationBar.stories.tsx">components-navigationbar · ./src/components/NavigationBar/NavigationBar.stories.tsx</div>
+    
+    <div class="hint">Figma &quot;❖ Navigation Bar&quot; (node 18:168) 재구현. height 48px, padding-y 4px, bg white. leftItem 유무에 따라 좌측 패딩이 20px ↔ 10px로 바뀐다.</div>
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  
+  
+  <input id="c-2-components-navigationbar-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  <input id="c-2-components-navigationbar-props" class="tg tg-props" type="checkbox" hidden />
+
+  <div class="panels">
+    
+    
+    
+        <div class="panel panel-props">
+          <div class="note ok">
+            <div class="row">
+              <span class="ex-name">Prop types <small>(react-docgen)</small></span>
+              <span class="badge ok">4 prop types</span>
+            </div>
+            <pre><code>Component: src/components/NavigationBar/NavigationBar.tsx::NavigationBar</code></pre>
+            <pre><code>Props:</code></pre>
+            <pre><code>className?: string
+
+/**
+ * 왼쪽 아이콘 버튼. 생략하면 타이틀이 왼쪽 끝(20px)까지 붙는다
+ */
+leftItem?: ReactNode
+
+/**
+ * 오른쪽 아이콘 버튼, 최대 3개 (Figma rightItem: none|1|2|3)
+ */
+rightItems?: ReactNode[] = []
+
+/**
+ * 타이틀 텍스트
+ */
+title?: string = &#39;Title&#39;</code></pre>
+          </div>
+        </div>
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { NavigationBar, NavigationBarItem } from "design-system";</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">leftItem: none / rightItem: none</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const TitleOnly = () =&gt; (
+  &lt;Frame&gt;
+    &lt;NavigationBar title=&quot;Title&quot; /&gt;
+  &lt;/Frame&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">leftItem: 1 / rightItem: none</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const BackWithTitle = () =&gt; (
+  &lt;Frame&gt;
+    &lt;NavigationBar title=&quot;Title&quot; leftItem={&lt;NavigationBarItem icon=&quot;back&quot; aria-label=&quot;뒤로&quot; /&gt;} /&gt;
+  &lt;/Frame&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">leftItem: none / rightItem: 1</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const TitleWithOneRight = () =&gt; (
+  &lt;Frame&gt;
+    &lt;NavigationBar title=&quot;Title&quot; rightItems={[&lt;NavigationBarItem key=&quot;close&quot; icon=&quot;close&quot; aria-label=&quot;닫기&quot; /&gt;]} /&gt;
+  &lt;/Frame&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">leftItem: 1 / rightItem: 3</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const BackWithThreeRight = () =&gt; (
+  &lt;Frame&gt;
+    &lt;NavigationBar
+      title=&quot;Title&quot;
+      leftItem={&lt;NavigationBarItem icon=&quot;back&quot; aria-label=&quot;뒤로&quot; /&gt;}
+      rightItems={[
+        &lt;NavigationBarItem key=&quot;search&quot; icon=&quot;search&quot; aria-label=&quot;검색&quot; /&gt;,
+        &lt;NavigationBarItem key=&quot;share&quot; icon=&quot;share&quot; aria-label=&quot;공유&quot; /&gt;,
+        &lt;NavigationBarItem key=&quot;more&quot; icon=&quot;more&quot; aria-label=&quot;더보기&quot; /&gt;,
+      ]}
+    /&gt;
+  &lt;/Frame&gt;
+);</code></pre>
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">실제 활용 예시</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              <div class="hint">실제 화면에서 조합해 쓰는 예시 — Icon + NavigationBar를 함께 활용한 3가지 대표 패턴</div>
+              <pre><code>const RealWorldUsage = () =&gt; (
+  &lt;div style={{ display: &#39;flex&#39;, flexDirection: &#39;column&#39;, gap: 24 }}&gt;
+    &lt;div&gt;
+      &lt;p style={{ fontSize: 12, color: colors.neutral[700], marginBottom: 8 }}&gt;상품 상세 (뒤로 + 공유 + 장바구니)&lt;/p&gt;
+      &lt;Frame&gt;
+        &lt;NavigationBar
+          title=&quot;상품 상세&quot;
+          leftItem={&lt;NavigationBarItem icon=&quot;back&quot; aria-label=&quot;뒤로&quot; /&gt;}
+          rightItems={[
+            &lt;NavigationBarItem key=&quot;share&quot; icon=&quot;share&quot; aria-label=&quot;공유&quot; /&gt;,
+            &lt;NavigationBarItem key=&quot;cart&quot; icon=&quot;cart&quot; aria-label=&quot;장바구니&quot; /&gt;,
+          ]}
+        /&gt;
+      &lt;/Frame&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+      &lt;p style={{ fontSize: 12, color: colors.neutral[700], marginBottom: 8 }}&gt;홈 (검색 + 알림 + 메뉴)&lt;/p&gt;
+      &lt;Frame&gt;
+        &lt;NavigationBar
+          title=&quot;홈&quot;
+          rightItems={[
+            &lt;NavigationBarItem key=&quot;search&quot; icon=&quot;search&quot; aria-label=&quot;검색&quot; /&gt;,
+            &lt;NavigationBarItem key=&quot;alarm&quot; icon=&quot;alarm&quot; aria-label=&quot;알림&quot; /&gt;,
+            &lt;NavigationBarItem key=&quot;menu&quot; icon=&quot;menu&quot; aria-label=&quot;메뉴&quot; /&gt;,
+          ]}
+        /&gt;
+      &lt;/Frame&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+      &lt;p style={{ fontSize: 12, color: colors.neutral[700], marginBottom: 8 }}&gt;모달 상단 (닫기만)&lt;/p&gt;
+      &lt;Frame&gt;
+        &lt;NavigationBar title=&quot;필터&quot; rightItems={[&lt;NavigationBarItem key=&quot;close&quot; icon=&quot;close&quot; aria-label=&quot;닫기&quot; /&gt;]} /&gt;
+      &lt;/Frame&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+);</code></pre>
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  class="card 
+  no-error 
+  has-info 
+  no-story-error
+  no-doc-error"
+  role="listitem"
   aria-label="Typography">
   <div class="head">
     <div class="title">
       <h2><span class="status-dot dot-ok"></span> Typography</h2>
       <div class="badges">
-        <label for="c-1-foundation-typography-props" class="badge ok as-toggle">7 prop types</label>
-        <label for="c-1-foundation-typography-info" class="badge info as-toggle">1 info</label>
-        <label for="c-1-foundation-typography-stories" class="badge ok as-toggle">6 stories</label>
+        <label for="c-3-foundation-typography-props" class="badge ok as-toggle">7 prop types</label>
+        <label for="c-3-foundation-typography-info" class="badge info as-toggle">1 info</label>
+        <label for="c-3-foundation-typography-stories" class="badge ok as-toggle">6 stories</label>
         
         
       </div>
@@ -752,11 +1095,11 @@ group?: ColorGroup | &#39;all&#39; = &#39;all&#39;</code></pre>
 
   <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
   
-  <input id="c-1-foundation-typography-info" class="tg tg-info" type="checkbox" hidden />
-  <input id="c-1-foundation-typography-stories" class="tg tg-stories" type="checkbox" hidden />
+  <input id="c-3-foundation-typography-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-3-foundation-typography-stories" class="tg tg-stories" type="checkbox" hidden />
   
   
-  <input id="c-1-foundation-typography-props" class="tg tg-props" type="checkbox" hidden />
+  <input id="c-3-foundation-typography-props" class="tg tg-props" type="checkbox" hidden />
 
   <div class="panels">
     
