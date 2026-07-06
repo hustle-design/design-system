@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
     if (lat && lng) {
       // 역지오코딩: 좌표 → 행정동 이름
-      const url = `https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${encodeURIComponent(lng)},${encodeURIComponent(lat)}&orders=admcode&output=json`;
+      const url = `https://maps.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${encodeURIComponent(lng)},${encodeURIComponent(lat)}&orders=admcode&output=json`;
       const r = await fetch(url, { headers });
       const data = await r.json();
       if (data?.error) {
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
 
     if (query) {
       // 지오코딩: 주소/건물명 검색 → 후보 목록
-      const url = `https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(query)}`;
+      const url = `https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(query)}`;
       const r = await fetch(url, { headers });
       const data = await r.json();
       if (data?.error) {
