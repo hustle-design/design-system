@@ -48,7 +48,7 @@ export default async function handler(req, res) {
         lat: Number(a.y),
         lng: Number(a.x),
       }));
-      res.status(200).json({ results, _debugStatus: data?.status, _debugErrorMessage: data?.errorMessage });
+      res.status(200).json({ results, _debugRaw: JSON.stringify(data), _debugHttpStatus: r.status });
       return;
     }
 
