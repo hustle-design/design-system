@@ -27,9 +27,13 @@ export default async function handler(req, res) {
       const url = `https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${encodeURIComponent(lng)},${encodeURIComponent(lat)}&orders=admcode&output=json`;
       const r = await fetch(url, { headers });
       const data = await r.json();
+      if (data?.error) {
+        res.status(502).json({ error: 'ncp_error', message: `${data.error.message}: ${data.error.details}` });
+        return;
+      }
       const area = data?.results?.[0]?.region;
       if (!area) {
-        res.status(200).json({ dong: null, raw: data });
+        res.status(200).json({ dong: null });
         return;
       }
       const dong = [area.area1?.name, area.area2?.name, area.area3?.name].filter(Boolean).join(' ');
@@ -42,13 +46,17 @@ export default async function handler(req, res) {
       const url = `https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(query)}`;
       const r = await fetch(url, { headers });
       const data = await r.json();
+      if (data?.error) {
+        res.status(502).json({ error: 'ncp_error', message: `${data.error.message}: ${data.error.details}` });
+        return;
+      }
       const results = (data?.addresses || []).slice(0, 8).map(a => ({
         roadAddress: a.roadAddress,
         jibunAddress: a.jibunAddress,
         lat: Number(a.y),
         lng: Number(a.x),
       }));
-      res.status(200).json({ results, _debugRaw: JSON.stringify(data), _debugHttpStatus: r.status });
+      res.status(200).json({ results });
       return;
     }
 
