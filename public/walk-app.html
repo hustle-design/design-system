@@ -3679,6 +3679,8 @@ function applyDongSelection(label, lat, lng) {
   }
   closeDongPicker();
   renderFilters();
+  renderCourses();
+  renderHomePanel();
 }
 
 /* ═══════════════════════════════
@@ -4975,7 +4977,16 @@ function diffDots(level, hard) {
 
 function renderCourses() {
   const list = document.getElementById('courses-list');
-  const filtered = activeFilter === '전체' ? COURSES : COURSES.filter(c => c.filter === activeFilter);
+  let filtered;
+  if (activeFilter === '집 근처' && state.homeCoord) {
+    filtered = coursesByDistance(state.homeCoord);
+  } else if (activeFilter === '직장 근처' && state.workCoord) {
+    filtered = coursesByDistance(state.workCoord);
+  } else if (activeFilter === '전체') {
+    filtered = COURSES;
+  } else {
+    filtered = COURSES.filter(c => c.filter === activeFilter);
+  }
 
   list.innerHTML = filtered.map(c => `
     <div class="course-card" id="card-${c.id}">
@@ -5078,6 +5089,19 @@ function switchTab(tab) {
 ═══════════════════════════════ */
 let homeRecIdx = 0;
 
+// 코스 실제 GPS 시작점과 좌표(집/직장) 사이 거리(km). 좌표가 없거나 코스에 실좌표가 없으면 Infinity.
+function courseDistanceKm(course, coord) {
+  const route = COURSE_GPS_ROUTES[course.id];
+  if (!coord || !route || !route.length) return Infinity;
+  return haversine(coord.lat, coord.lng, route[0][0], route[0][1]) / 1000;
+}
+
+function coursesByDistance(coord) {
+  return COURSES
+    .filter(c => COURSE_GPS_ROUTES[c.id])
+    .sort((a, b) => courseDistanceKm(a, coord) - courseDistanceKm(b, coord));
+}
+
 // 시간대별 코스 추천 매핑
 const TIME_REC = [
   // [시작h, 종료h, courseId, 헤더 레이블]
@@ -5134,11 +5158,19 @@ function renderHomePanel() {
     return `<div class="home-streak-day ${cls}">${streakDone[i] ? '<span class="streak-check">✓</span>' : d}</div>`;
   }).join('');
 
-  // 시간대별 추천 코스
-  const timeRec = getTimeRec();
-  const rec = COURSES.find(c => c.id === timeRec.id) || COURSES[0];
+  // 추천 코스 — 집 주소가 등록되어 있으면 실거리 기준 최근접 코스, 없으면 시간대별 추천으로 폴백
+  let rec, recTitle;
+  if (state.homeCoord) {
+    rec = coursesByDistance(state.homeCoord)[0];
+    const distKm = rec ? courseDistanceKm(rec, state.homeCoord).toFixed(1) : null;
+    recTitle = rec ? `집에서 ${distKm}km, 가장 가까운 코스예요 📍` : '아직 추천할 코스가 없어요';
+  } else {
+    const timeRec = getTimeRec();
+    rec = COURSES.find(c => c.id === timeRec.id) || COURSES[0];
+    recTitle = timeRec.label;
+  }
   homeRecIdx = COURSES.indexOf(rec);
-  document.getElementById('home-rec-title').textContent = timeRec.label;
+  document.getElementById('home-rec-title').textContent = recTitle;
   if (rec) {
     document.getElementById('home-rec-name').textContent = rec.name;
     document.getElementById('home-rec-meta').textContent = `${rec.distance}km · ${rec.duration}분 · ${rec.area}`;
