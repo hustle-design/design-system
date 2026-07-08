@@ -3066,7 +3066,7 @@ body {
         <div class="sheet-tags" id="sheet-tags"></div>
       </div>
       <div class="sheet-actions">
-        <button class="sheet-btn-start" onclick="startCourseFromSheet()">
+        <button class="sheet-btn-start" id="sheet-btn-start" onclick="handleSheetCta()">
           기록 시작
         </button>
         <button class="sheet-btn-close" onclick="closeCourseSheet()" aria-label="닫기">
@@ -4912,8 +4912,11 @@ function showToast(msg) {
    COURSE SHEET
 ═══════════════════════════════ */
 let sheetCourse = null;
+let sheetMode = 'course'; // 'course' | 'history' — 시트를 코스에서 열었는지 아카이브 기록에서 열었는지
+let sheetHistoryEntry = null;
 
 function selectCourse(course) {
+  sheetMode = 'course';
   sheetCourse = course;
 
   // Populate text
@@ -4932,6 +4935,8 @@ function selectCourse(course) {
   // Tags
   document.getElementById('sheet-tags').innerHTML =
     course.tags.map((t, i) => `<span class="course-tag ${course.tagTypes[i]}">${t}</span>`).join('');
+
+  document.getElementById('sheet-btn-start').textContent = '기록 시작';
 
   // Open sheet first so canvas has layout dimensions
   const sheet = document.getElementById('course-sheet');
@@ -4953,10 +4958,52 @@ function selectCourse(course) {
   }));
 }
 
+// 아카이브 > 산책 기록 카드를 탭했을 때 — 같은 코스 상세 시트를 재활용해 그 기록을 보여준다
+function openHistoryDetail(id) {
+  const entry = state.history.find(h => h.id === id);
+  if (!entry) return;
+  sheetMode = 'history';
+  sheetHistoryEntry = entry;
+
+  document.getElementById('sheet-area').textContent = `${entry.dateLabel} · ${entry.timeLabel}`;
+  document.getElementById('sheet-name').textContent = '나의 산책 기록';
+  document.getElementById('sheet-desc').textContent = '이 코스로 다시 걸어볼까요?';
+  document.getElementById('sheet-dist').textContent = entry.distance.toFixed(1);
+  document.getElementById('sheet-dur').textContent = Math.round(entry.duration / 60);
+
+  // 3번째 스탯 슬롯: 난이도 대신 걸음 수로 재활용
+  document.getElementById('sheet-diff-dots').innerHTML =
+    `<div style="font:var(--H4);font-weight:700;color:var(--ink);line-height:1;">${entry.steps.toLocaleString('ko-KR')}</div>`;
+  document.getElementById('sheet-diff-label').textContent = '걸음';
+
+  document.getElementById('sheet-tags').innerHTML = '';
+  document.getElementById('sheet-btn-start').textContent = '이 코스로 다시 걷기';
+
+  const sheet = document.getElementById('course-sheet');
+  sheet.style.pointerEvents = 'all';
+  sheet.classList.add('open');
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const wrap = document.getElementById('sheet-map-canvas');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    const path = (entry.route || []).map(p => [p.lat, p.lng]);
+    drawPathOnMap(wrap, path);
+  }));
+}
+
 function closeCourseSheet() {
   const sheet = document.getElementById('course-sheet');
   sheet.classList.remove('open');
   setTimeout(() => { sheet.style.pointerEvents = 'none'; }, 380);
+}
+
+function handleSheetCta() {
+  if (sheetMode === 'history') {
+    startHistoryRewalk();
+  } else {
+    startCourseFromSheet();
+  }
 }
 
 function startCourseFromSheet() {
@@ -4964,6 +5011,24 @@ function startCourseFromSheet() {
   activeCourse = sheetCourse;
   document.getElementById('banner-name').textContent = sheetCourse.name;
   document.getElementById('banner-meta').textContent = `${sheetCourse.distance}km · 약 ${sheetCourse.duration}분`;
+  document.getElementById('course-banner').classList.add('visible');
+  drawMap();
+  closeCourseSheet();
+  switchTab('record');
+}
+
+// 지난 산책 기록을 실제 걸었던 좌표 그대로 다시 걷는다 — COURSE_GPS_ROUTES에 임시로 등록해
+// 기존 코스 가이드/지도 로직을 그대로 재사용한다
+function startHistoryRewalk() {
+  if (!sheetHistoryEntry) return;
+  const entry = sheetHistoryEntry;
+  const path = (entry.route || []).map(p => [p.lat, p.lng]);
+  const syntheticId = `hist-${entry.id}`;
+  if (path.length > 1) COURSE_GPS_ROUTES[syntheticId] = path;
+
+  activeCourse = { id: syntheticId, name: '나의 산책 기록', distance: entry.distance, duration: Math.round(entry.duration / 60) };
+  document.getElementById('banner-name').textContent = activeCourse.name;
+  document.getElementById('banner-meta').textContent = `${activeCourse.distance.toFixed(1)}km · 약 ${activeCourse.duration}분`;
   document.getElementById('course-banner').classList.add('visible');
   drawMap();
   closeCourseSheet();
@@ -5065,10 +5130,9 @@ function renderCourses() {
   });
 }
 
-function drawRealCourseMap(container, courseId) {
-  const route = COURSE_GPS_ROUTES[courseId];
-  if (!route || !route.length) return;
-  // renderCourses()가 매번 innerHTML을 새로 그리므로 컨테이너도 매번 새 DOM — 맵도 항상 새로 생성
+function drawPathOnMap(container, path) {
+  if (!path || !path.length) return;
+  // 호출할 때마다 컨테이너가 새 DOM이므로 (innerHTML 재생성) 맵도 항상 새로 생성
   const map = new naver.maps.Map(container, {
     draggable: false,
     pinchZoom: false,
@@ -5084,14 +5148,18 @@ function drawRealCourseMap(container, courseId) {
   });
   new naver.maps.Polyline({
     map,
-    path: route.map(([lat, lng]) => new naver.maps.LatLng(lat, lng)),
+    path: path.map(([lat, lng]) => new naver.maps.LatLng(lat, lng)),
     strokeColor: '#1A1C20',
     strokeWeight: 4,
     strokeOpacity: 0.9,
     strokeLineCap: 'round',
     strokeLineJoin: 'round',
   });
-  map.fitBounds(_getNaverBounds(route), { top: 16, right: 16, bottom: 16, left: 16 });
+  map.fitBounds(_getNaverBounds(path), { top: 16, right: 16, bottom: 16, left: 16 });
+}
+
+function drawRealCourseMap(container, courseId) {
+  drawPathOnMap(container, COURSE_GPS_ROUTES[courseId]);
 }
 
 /* ═══════════════════════════════
@@ -5330,6 +5398,7 @@ function renderHistory() {
   state.history.forEach(h => {
     const card = document.createElement('div');
     card.className = 'history-card';
+    card.onclick = () => openHistoryDetail(h.id);
     card.innerHTML = `
       <div class="hist-thumb"><canvas id="thumb-${h.id}" width="62" height="62"></canvas></div>
       <div class="hist-info">
