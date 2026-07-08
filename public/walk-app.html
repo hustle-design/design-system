@@ -1297,11 +1297,18 @@ body {
   gap: 4px;
   padding: 6px 16px 5px;
   border-radius: 999px;
-  transition: background 0.18s;
+  transition: background 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .nav-btn.active .nav-btn-inner {
   background: var(--neutral-200);
+  transform: scale(1.06);
+}
+
+/* 탭 시 눌림 피드백 — 선택된 탭의 바운스보다 우선 적용되도록 아래에 배치 */
+.nav-btn:active .nav-btn-inner {
+  transform: scale(0.90);
+  transition: transform 0.1s ease;
 }
 
 .nav-btn svg { width: 20px; height: 20px; display: block; }
@@ -1309,11 +1316,11 @@ body {
    다른 아이콘보다 라벨과의 시각적 간격이 좁아 보인다 — margin으로 보정 */
 #nav-courses svg { transform: translateY(-2px); }
 
-/* icon state toggle */
-.ic-out { display: block; }
-.ic-fill { display: none; }
-.nav-btn.active .ic-out { display: none; }
-.nav-btn.active .ic-fill { display: block; }
+/* icon state toggle — display 대신 opacity로 크로스페이드 */
+.ic-out { opacity: 1; transition: opacity 0.2s ease; }
+.ic-fill { opacity: 0; transition: opacity 0.2s ease; }
+.nav-btn.active .ic-out { opacity: 0; }
+.nav-btn.active .ic-fill { opacity: 1; }
 
 .nav-btn-label {
   font-size: 10px;
