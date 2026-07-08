@@ -3602,7 +3602,7 @@ function renderDongResults(results, sectionLabel) {
   const list = document.getElementById('dong-picker-results');
   const label = sectionLabel ? `<div class="dong-result-section-label">${sectionLabel}</div>` : '';
   if (!results.length) {
-    list.innerHTML = label + '<div class="dong-result-empty">검색 결과가 없어요</div>';
+    list.innerHTML = label + '<div class="dong-result-empty">검색 결과가 없어요<br>동 이름이나 도로명 주소로 검색해보세요 (예: 서초동, 불정로 6)</div>';
     return;
   }
   list.innerHTML = label + results.map((r, i) => `

@@ -42,14 +42,28 @@ export default async function handler(req, res) {
     }
 
     if (query) {
-      // 지오코딩: 주소/건물명 검색 → 후보 목록
-      const url = `https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(query)}`;
-      const r = await fetch(url, { headers });
-      const data = await r.json();
+      // 지오코딩: 주소 검색 → 후보 목록
+      // 주의: NCP Geocoding은 주소(도로명/지번/동) 전용이라 "정자역" 같은 장소명은 못 찾는다.
+      const geocode = async (q) => {
+        const r = await fetch(`https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query=${encodeURIComponent(q)}`, { headers });
+        return r.json();
+      };
+
+      let data = await geocode(query);
       if (data?.error) {
         res.status(502).json({ error: 'ncp_error', message: `${data.error.message}: ${data.error.details}` });
         return;
       }
+
+      // 폴백: "OO역"으로 검색해 결과가 없으면 동네 등록 맥락에 맞게 "OO동"으로 재시도
+      if (!(data?.addresses || []).length) {
+        const m = query.trim().match(/^(.+?)\s*역$/);
+        if (m) {
+          const retry = await geocode(`${m[1]}동`);
+          if (!retry?.error && (retry?.addresses || []).length) data = retry;
+        }
+      }
+
       const results = (data?.addresses || []).slice(0, 8).map(a => ({
         roadAddress: a.roadAddress,
         jibunAddress: a.jibunAddress,
