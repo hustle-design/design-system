@@ -4529,17 +4529,33 @@ function drawThumb(canvas, route) {
 
   if (!route || route.length < 2) return;
 
-  // {lat,lng} → {x,y} 변환 (lat은 위로 갈수록 커지므로 y축 반전)
-  const pts = route[0].lat !== undefined
-    ? route.map(p => ({ x: p.lng, y: -p.lat }))
-    : route;
+  const isReal = route[0].lat !== undefined;
+  let scaled;
 
-  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-  pts.forEach(p => { minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y); });
-  const rw=maxX-minX||1, rh=maxY-minY||1;
-  const scale=Math.min(44/rw,44/rh);
-  const ox=(62-rw*scale)/2, oy=(62-rh*scale)/2;
-  const scaled=pts.map(p=>({x:ox+(p.x-minX)*scale,y:oy+(p.y-minY)*scale}));
+  if (isReal) {
+    // 실제 GPS 기록: 실거리 비례로 그린다 — 짧게 걸었으면 작게, 길게 걸었으면 크게 보이도록
+    // (기존엔 박스에 항상 꽉 차게 정규화해서 2.3km나 4.1km나 똑같은 크기로 보였음)
+    const lat0 = route[0].lat * Math.PI / 180;
+    const mPerDegLat = 111320;
+    const mPerDegLng = 111320 * Math.cos(lat0);
+    const pts = route.map(p => ({
+      x: (p.lng - route[0].lng) * mPerDegLng,
+      y: -(p.lat - route[0].lat) * mPerDegLat,
+    }));
+    const PX_PER_METER = 44 / 500; // 500m가 44px를 채우는 고정 스케일 (모든 기록 공통)
+    scaled = pts.map(p => ({ x: 31 + p.x * PX_PER_METER, y: 31 + p.y * PX_PER_METER }));
+  } else {
+    // 데모/구형 픽셀 좌표: 기존처럼 박스에 맞춰 정규화
+    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+    route.forEach(p => { minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y); });
+    const rw=maxX-minX||1, rh=maxY-minY||1;
+    const scale=Math.min(44/rw,44/rh);
+    const ox=(62-rw*scale)/2, oy=(62-rh*scale)/2;
+    scaled = route.map(p=>({x:ox+(p.x-minX)*scale,y:oy+(p.y-minY)*scale}));
+  }
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(1, 1, 60, 60); ctx.clip(); // 실거리가 커서 넘치는 경로는 썸네일 밖으로 안 새게 클립
 
   ctx.beginPath(); ctx.strokeStyle='#3E9158'; ctx.lineWidth=2;
   ctx.lineCap='round'; ctx.lineJoin='round';
@@ -4548,6 +4564,7 @@ function drawThumb(canvas, route) {
   ctx.stroke();
   ctx.beginPath(); ctx.fillStyle='#2B6540';
   ctx.arc(scaled[0].x,scaled[0].y,3,0,Math.PI*2); ctx.fill();
+  ctx.restore();
 }
 
 /* ═══════════════════════════════
